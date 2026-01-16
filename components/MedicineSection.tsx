@@ -53,14 +53,14 @@ export function MedicineSection({ onNavigate }: MedicineSectionProps) {
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-br from-pink-50 to-purple-50">
+    <section className="py-16 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl mb-2">Popular Medicines</h2>
-            <p className="text-muted-foreground">Order medicines online with fast delivery</p>
+            <h2 className="text-3xl mb-2 text-foreground font-bold">Popular Medicines</h2>
+            <p className="text-foreground/80 font-medium">Order medicines online with fast delivery</p>
           </div>
-          <Button variant="outline" onClick={() => onNavigate("medicine-enhanced")}>
+          <Button variant="outline" onClick={() => onNavigate("medicine")}>
             View All Medicines
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
@@ -68,11 +68,11 @@ export function MedicineSection({ onNavigate }: MedicineSectionProps) {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {medicines.map((medicine) => (
-            <Card key={medicine.id} className="p-6 hover:shadow-xl transition-all bg-white">
+            <Card key={medicine.id} className="p-6 hover:shadow-xl transition-all bg-card border-border">
               <div className="text-center mb-4">
                 <div className="text-5xl mb-3">{medicine.image}</div>
                 <Badge variant="secondary" className="mb-2">{medicine.category}</Badge>
-                <h3 className="text-lg mb-2">{medicine.name}</h3>
+                <h3 className="text-lg mb-2 text-foreground font-semibold">{medicine.name}</h3>
                 {medicine.inStock && (
                   <Badge className="bg-green-500 mb-2">In Stock</Badge>
                 )}
@@ -81,10 +81,10 @@ export function MedicineSection({ onNavigate }: MedicineSectionProps) {
               <div className="space-y-3">
                 <div className="flex items-baseline gap-2">
                   <span className="text-2xl text-pink-600 font-semibold">₹{medicine.price}</span>
-                  <span className="text-sm text-muted-foreground line-through">₹{medicine.mrp}</span>
+                  <span className="text-sm text-foreground/60 line-through">₹{medicine.mrp}</span>
                 </div>
                 <Badge className="bg-green-500">{medicine.discount}% OFF</Badge>
-                <Button className="w-full" onClick={() => onNavigate("medicine-enhanced")}>
+                <Button className="w-full" onClick={() => onNavigate("medicine")}>
                   <Pill className="w-4 h-4 mr-2" />
                   View Details
                 </Button>
@@ -94,7 +94,7 @@ export function MedicineSection({ onNavigate }: MedicineSectionProps) {
         </div>
 
         <div className="text-center mt-8">
-          <Button size="lg" onClick={() => onNavigate("medicine-enhanced")}>
+          <Button size="lg" onClick={() => onNavigate("medicine")}>
             <Pill className="w-5 h-5 mr-2" />
             Browse All Medicines
             <ArrowRight className="w-5 h-5 ml-2" />

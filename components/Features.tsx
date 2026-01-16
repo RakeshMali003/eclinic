@@ -69,10 +69,10 @@ export function Features({ onNavigate }: FeaturesProps) {
       <Navigation onNavigate={onNavigate} onGetStarted={() => onNavigate("login")} />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-pink-50 to-purple-50 py-20">
+      <section className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 py-20 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Badge className="mb-6 bg-pink-600 text-white px-6 py-2">60+ Advanced Features</Badge>
-          <h1 className="text-5xl mb-6">Powerful Features for Modern Healthcare</h1>
+          <h1 className="text-5xl mb-6 text-foreground font-bold">Powerful Features for Modern Healthcare</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
             Everything you need to deliver exceptional patient care, streamline operations, and grow your practice
           </p>
@@ -154,10 +154,10 @@ export function Features({ onNavigate }: FeaturesProps) {
       </section>
 
       {/* Benefits Grid */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">Why Healthcare Providers Choose E-Clinic</h2>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Why Healthcare Providers Choose E-Clinic</h2>
             <p className="text-xl text-muted-foreground">Join thousands of satisfied healthcare professionals</p>
           </div>
 

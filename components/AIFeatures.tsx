@@ -130,7 +130,7 @@ export function AIFeaturesEnhanced({ onNavigate }: AIFeaturesEnhancedProps) {
       <Navigation onNavigate={onNavigate} onGetStarted={() => onNavigate("login")} />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 py-24 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-pink-900/20 via-purple-900/20 to-blue-900/20 py-24 overflow-hidden border-b border-border">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <Badge className="mb-6 px-6 py-2 text-base bg-gradient-to-r from-pink-600 to-purple-600 text-white border-0">
@@ -199,7 +199,7 @@ export function AIFeaturesEnhanced({ onNavigate }: AIFeaturesEnhancedProps) {
                   </div>
 
                   {/* Example */}
-                  <Card className={`p-6 border-l-4 border-pink-600 bg-gradient-to-br from-pink-50 to-purple-50`}>
+                  <Card className={`p-6 border-l-4 border-pink-600 bg-gradient-to-br from-pink-900/10 to-purple-900/10`}>
                     <div className="flex items-start gap-3">
                       <Sparkles className="w-5 h-5 text-pink-600 flex-shrink-0 mt-0.5" />
                       <div>
@@ -228,7 +228,7 @@ export function AIFeaturesEnhanced({ onNavigate }: AIFeaturesEnhancedProps) {
       </section>
 
       {/* Security & Compliance */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-pink-600 to-purple-600 rounded-2xl mb-6 shadow-lg">
@@ -260,10 +260,10 @@ export function AIFeaturesEnhanced({ onNavigate }: AIFeaturesEnhancedProps) {
           </div>
 
           {/* Case Study */}
-          <Card className="p-8 bg-white shadow-xl">
+          <Card className="p-8 bg-card border-border shadow-xl">
             <h3 className="text-2xl mb-8 text-center">Case Study: 40% Admin Time Reduction</h3>
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center p-6 bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl">
+              <div className="text-center p-6 bg-gradient-to-br from-pink-900/10 to-purple-900/10 rounded-2xl">
                 <div className="text-5xl bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">40%</div>
                 <p className="text-muted-foreground">Less admin time</p>
               </div>

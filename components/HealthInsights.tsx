@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { PageView } from "../App";
-import { TrendingUp, Heart, Activity, Brain, LineChart, Zap, Shield, Award, CheckCircle, BarChart3, Users, Target } from "lucide-react";
+import { TrendingUp, Heart, Activity, Brain, LineChart, Zap, CheckCircle, Users, Target } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { MedicineSection } from "./MedicineSection";
 
@@ -48,17 +48,17 @@ export function HealthInsights({ onNavigate }: HealthInsightsProps) {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Navigation onNavigate={onNavigate} onGetStarted={() => onNavigate("login")} />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-pink-50 to-purple-50 py-20">
+      <section className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 py-20 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <Badge className="mb-6 bg-pink-600">AI-Powered Health Intelligence</Badge>
-              <h1 className="text-5xl mb-6">Health Insights & Analytics</h1>
-              <p className="text-xl text-muted-foreground mb-8">
+              <h1 className="text-5xl mb-6 font-bold text-foreground">Health Insights & Analytics</h1>
+              <p className="text-xl text-foreground/80 mb-8 font-medium">
                 Transform your health data into actionable insights with AI-powered analytics. Make informed decisions about your wellbeing with personalized recommendations and predictive health scoring.
               </p>
               <div className="flex gap-4">
@@ -74,21 +74,21 @@ export function HealthInsights({ onNavigate }: HealthInsightsProps) {
               <div className="grid grid-cols-3 gap-4 mt-8">
                 <div>
                   <div className="text-3xl text-pink-600 mb-1">95%</div>
-                  <p className="text-sm text-muted-foreground">Accuracy Rate</p>
+                  <p className="text-sm text-foreground/70">Accuracy Rate</p>
                 </div>
                 <div>
                   <div className="text-3xl text-pink-600 mb-1">50K+</div>
-                  <p className="text-sm text-muted-foreground">Users Tracked</p>
+                  <p className="text-sm text-foreground/70">Users Tracked</p>
                 </div>
                 <div>
                   <div className="text-3xl text-pink-600 mb-1">24/7</div>
-                  <p className="text-sm text-muted-foreground">Monitoring</p>
+                  <p className="text-sm text-foreground/70">Monitoring</p>
                 </div>
               </div>
             </div>
 
             <div>
-              <Card className="overflow-hidden shadow-2xl">
+              <Card className="overflow-hidden shadow-2xl bg-card border-border">
                 <ImageWithFallback 
                   src="https://images.unsplash.com/photo-1663354863388-9ced5806543a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoZWFsdGhjYXJlJTIwYW5hbHl0aWNzfGVufDF8fHx8MTc2MjMzNDI4Mnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
                   alt="Health Analytics Dashboard"
@@ -101,23 +101,23 @@ export function HealthInsights({ onNavigate }: HealthInsightsProps) {
       </section>
 
       {/* Main Features */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl mb-4">Comprehensive Health Intelligence</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Comprehensive Health Intelligence</h2>
+            <p className="text-xl text-foreground/80 max-w-3xl mx-auto font-medium">
               Our AI-powered platform analyzes your health data to provide actionable insights
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="p-8 hover:shadow-xl transition-all">
+              <Card key={index} className="p-8 hover:shadow-xl transition-all bg-card border-border">
                 <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6`}>
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl mb-4">{feature.title}</h2>
-                <p className="text-muted-foreground mb-6">{feature.desc}</p>
+                <h2 className="text-2xl mb-4 text-foreground font-semibold">{feature.title}</h2>
+                <p className="text-foreground/70 mb-6">{feature.desc}</p>
                 <Button onClick={() => onNavigate("login")}>Try It Now</Button>
               </Card>
             ))}
@@ -126,19 +126,19 @@ export function HealthInsights({ onNavigate }: HealthInsightsProps) {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">Advanced Health Tracking</h2>
-            <p className="text-xl text-muted-foreground">Everything you need to stay on top of your health</p>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Advanced Health Tracking</h2>
+            <p className="text-xl text-foreground/80 font-medium">Everything you need to stay on top of your health</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit, index) => (
-              <Card key={index} className="p-6 text-center hover:shadow-lg transition-all">
+              <Card key={index} className="p-6 text-center hover:shadow-lg transition-all bg-card border-border">
                 <benefit.icon className="w-12 h-12 text-pink-600 mx-auto mb-4" />
-                <h3 className="mb-2">{benefit.title}</h3>
-                <p className="text-sm text-muted-foreground mb-3">{benefit.desc}</p>
+                <h3 className="mb-2 text-foreground font-semibold">{benefit.title}</h3>
+                <p className="text-sm text-foreground/70 mb-3">{benefit.desc}</p>
                 <Badge className="bg-pink-600">{benefit.stats}</Badge>
               </Card>
             ))}
@@ -147,40 +147,40 @@ export function HealthInsights({ onNavigate }: HealthInsightsProps) {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">How It Works</h2>
-            <p className="text-xl text-muted-foreground">Simple steps to better health insights</p>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">How It Works</h2>
+            <p className="text-xl text-foreground/80 font-medium">Simple steps to better health insights</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="p-8 text-center">
-              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Card className="p-8 text-center bg-card border-border">
+              <div className="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-6 border border-pink-800/30">
                 <span className="text-2xl text-pink-600">1</span>
               </div>
-              <h3 className="text-xl mb-3">Connect Your Data</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-xl mb-3 text-foreground font-semibold">Connect Your Data</h3>
+              <p className="text-foreground/70">
                 Sync your health devices, upload reports, or manually enter health metrics
               </p>
             </Card>
 
-            <Card className="p-8 text-center">
-              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Card className="p-8 text-center bg-card border-border">
+              <div className="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-6 border border-pink-800/30">
                 <span className="text-2xl text-pink-600">2</span>
               </div>
-              <h3 className="text-xl mb-3">AI Analysis</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-xl mb-3 text-foreground font-semibold">AI Analysis</h3>
+              <p className="text-foreground/70">
                 Our AI analyzes patterns, trends, and predicts potential health risks
               </p>
             </Card>
 
-            <Card className="p-8 text-center">
-              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Card className="p-8 text-center bg-card border-border">
+              <div className="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-6 border border-pink-800/30">
                 <span className="text-2xl text-pink-600">3</span>
               </div>
-              <h3 className="text-xl mb-3">Get Insights</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-xl mb-3 text-foreground font-semibold">Get Insights</h3>
+              <p className="text-foreground/70">
                 Receive personalized recommendations and actionable health insights
               </p>
             </Card>
@@ -189,11 +189,11 @@ export function HealthInsights({ onNavigate }: HealthInsightsProps) {
       </section>
 
       {/* Tracked Metrics */}
-      <section className="py-20 bg-gradient-to-br from-purple-50 to-pink-50">
+      <section className="py-20 bg-gradient-to-br from-purple-900/10 to-pink-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">What We Track</h2>
-            <p className="text-xl text-muted-foreground">Comprehensive health monitoring across all vital metrics</p>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">What We Track</h2>
+            <p className="text-xl text-foreground/80 font-medium">Comprehensive health monitoring across all vital metrics</p>
           </div>
 
           <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -202,9 +202,9 @@ export function HealthInsights({ onNavigate }: HealthInsightsProps) {
               "Sleep Quality", "Activity Levels", "Nutrition", "Mental Health",
               "Medications", "Lab Results", "Symptoms", "Vital Signs"
             ].map((metric, index) => (
-              <Card key={index} className="p-4 text-center hover:shadow-md transition-all">
+              <Card key={index} className="p-4 text-center hover:shadow-md transition-all bg-card border-border">
                 <CheckCircle className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                <p>{metric}</p>
+                <p className="text-foreground font-medium">{metric}</p>
               </Card>
             ))}
           </div>

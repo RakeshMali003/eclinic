@@ -8,7 +8,7 @@ import { Footer } from "./Footer";
 import { useCart } from "../contexts/CartContext";
 import { 
   Search, Upload, ShoppingCart, Filter, Star, Pill, 
-  Heart, TrendingUp, Clock, CheckCircle, X, Plus, Minus,
+  Heart, TrendingUp, Clock, CheckCircle, X,
   FileText, Zap, ShieldCheck
 } from "lucide-react";
 import type { PageView } from "../App";
@@ -158,7 +158,7 @@ export function MedicineEnhanced({ onNavigate, user, onLoginRequired }: Medicine
   };
 
   // Mock OCR processing - In real app, use Tesseract.js or backend API
-  const processOCR = async (file: File) => {
+  const processOCR = async (_file: File) => {
     setIsProcessing(true);
     
     // Simulate OCR processing
@@ -203,15 +203,15 @@ export function MedicineEnhanced({ onNavigate, user, onLoginRequired }: Medicine
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
+    <div className="min-h-screen bg-background">
       <Navigation onNavigate={onNavigate} cartCount={getItemCount()} />
 
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-pink-600 to-purple-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl mb-4">Order Medicines Online</h1>
-            <p className="text-xl mb-8 opacity-90">Genuine medicines at your doorstep with fast delivery</p>
+            <h1 className="text-4xl md:text-5xl mb-4 font-bold">Order Medicines Online</h1>
+            <p className="text-xl mb-8 opacity-90 font-medium">Genuine medicines at your doorstep with fast delivery</p>
             
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto">
@@ -221,7 +221,7 @@ export function MedicineEnhanced({ onNavigate, user, onLoginRequired }: Medicine
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for medicines, health products..."
-                  className="pl-12 pr-4 py-6 text-lg bg-white"
+                  className="pl-12 pr-4 py-6 text-lg bg-white text-gray-900 placeholder-gray-500 border-gray-200"
                 />
               </div>
             </div>
@@ -336,18 +336,18 @@ export function MedicineEnhanced({ onNavigate, user, onLoginRequired }: Medicine
       )}
 
       {/* Categories */}
-      <div className="bg-white border-b py-4 sticky top-0 z-30">
+      <div className="bg-card border-b border-border py-4 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-4 overflow-x-auto">
-            <Filter className="w-5 h-5 text-gray-600 flex-shrink-0" />
+            <Filter className="w-5 h-5 text-foreground/70 flex-shrink-0" />
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-full whitespace-nowrap transition-all ${
+                className={`px-4 py-2 rounded-full whitespace-nowrap transition-all font-medium ${
                   selectedCategory === cat.id
                     ? 'bg-pink-600 text-white'
-                    : 'bg-gray-100 hover:bg-gray-200'
+                    : 'bg-secondary hover:bg-secondary/80 text-foreground/90'
                 }`}
               >
                 <span className="mr-2">{typeof cat.icon === 'string' ? cat.icon : null}</span>
@@ -361,12 +361,12 @@ export function MedicineEnhanced({ onNavigate, user, onLoginRequired }: Medicine
       {/* Medicines Grid */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl mb-2">Available Medicines</h2>
-            <p className="text-muted-foreground">
-              Showing {filteredMedicines.length} {filteredMedicines.length === 1 ? 'medicine' : 'medicines'}
-            </p>
-          </div>
+            <div>
+              <h2 className="text-2xl mb-2 text-foreground font-bold">Available Medicines</h2>
+              <p className="text-muted-foreground">
+                Showing {filteredMedicines.length} {filteredMedicines.length === 1 ? 'medicine' : 'medicines'}
+              </p>
+            </div>
           <Button variant="outline" onClick={() => onNavigate('home')}>
             View Cart ({getItemCount()})
           </Button>
@@ -374,7 +374,7 @@ export function MedicineEnhanced({ onNavigate, user, onLoginRequired }: Medicine
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMedicines.map((medicine) => (
-            <Card key={medicine.id} className="p-6 hover:shadow-xl transition-all">
+            <Card key={medicine.id} className="p-6 hover:shadow-xl transition-all bg-card border-border">
               <div className="flex items-start justify-between mb-4">
                 <div className="text-5xl">{medicine.image}</div>
                 <div className="flex flex-col gap-2">
@@ -389,7 +389,7 @@ export function MedicineEnhanced({ onNavigate, user, onLoginRequired }: Medicine
                 </div>
               </div>
 
-              <h3 className="text-lg mb-1">{medicine.name}</h3>
+              <h3 className="text-lg mb-1 text-foreground font-semibold">{medicine.name}</h3>
               <p className="text-sm text-muted-foreground mb-3">{medicine.genericName}</p>
               <p className="text-xs text-muted-foreground mb-3">{medicine.pack}</p>
 
@@ -447,27 +447,27 @@ export function MedicineEnhanced({ onNavigate, user, onLoginRequired }: Medicine
       </div>
 
       {/* Trust Badges */}
-      <div className="bg-white border-t py-12">
+      <div className="bg-card border-t border-border py-12">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-6 text-center">
             <div>
               <ShieldCheck className="w-12 h-12 mx-auto mb-3 text-green-600" />
-              <h4 className="mb-2">100% Genuine</h4>
+              <h4 className="mb-2 text-foreground font-semibold">100% Genuine</h4>
               <p className="text-sm text-muted-foreground">All medicines verified</p>
             </div>
             <div>
               <TrendingUp className="w-12 h-12 mx-auto mb-3 text-blue-600" />
-              <h4 className="mb-2">Best Prices</h4>
+              <h4 className="mb-2 text-foreground font-semibold">Best Prices</h4>
               <p className="text-sm text-muted-foreground">Lowest prices guaranteed</p>
             </div>
             <div>
               <Clock className="w-12 h-12 mx-auto mb-3 text-purple-600" />
-              <h4 className="mb-2">Fast Delivery</h4>
+              <h4 className="mb-2 text-foreground font-semibold">Fast Delivery</h4>
               <p className="text-sm text-muted-foreground">Same-day delivery available</p>
             </div>
             <div>
               <Heart className="w-12 h-12 mx-auto mb-3 text-pink-600" />
-              <h4 className="mb-2">Expert Support</h4>
+              <h4 className="mb-2 text-foreground font-semibold">Expert Support</h4>
               <p className="text-sm text-muted-foreground">24/7 pharmacist help</p>
             </div>
           </div>

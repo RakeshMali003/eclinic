@@ -3,7 +3,6 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card } from "./ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Heart, ArrowLeft, User, Stethoscope, Building2, Phone, Mail } from "lucide-react";
 import type { User as UserType } from "../App";
 
@@ -18,7 +17,6 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
   const [selectedRole, setSelectedRole] = useState<"patient" | "doctor" | "clinic">("patient");
   const [mobileNumber, setMobileNumber] = useState("");
   const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
 
   const roles = [
     {
@@ -44,7 +42,6 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
   const handleSendOTP = () => {
     if (mobileNumber.length === 10) {
       // Mock OTP send
-      setOtpSent(true);
       setStep("otp");
       // In real app, send OTP via SMS
       alert(`OTP sent to ${mobileNumber}: 123456 (Demo)`);
@@ -73,7 +70,7 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Button 
           variant="ghost" 
@@ -91,8 +88,8 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
             </div>
           </div>
           
-          <h2 className="text-center mb-2">Welcome to E-Clinic</h2>
-          <p className="text-center text-muted-foreground mb-6">
+          <h2 className="text-center mb-2 text-foreground font-bold">Welcome to E-Clinic</h2>
+          <p className="text-center text-foreground/80 mb-6 font-medium">
             {step === "role" && "Select your role to continue"}
             {step === "mobile" && "Enter your mobile number"}
             {step === "otp" && "Enter OTP to verify"}
@@ -108,14 +105,14 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
                     <button
                       key={role.value}
                       onClick={() => handleRoleSelect(role.value)}
-                      className="p-4 rounded-lg border-2 transition-all hover:border-pink-300 hover:bg-pink-50 text-left flex items-center gap-4"
+                      className="p-4 rounded-lg border-2 transition-all hover:border-pink-400 hover:bg-pink-900/20 text-left flex items-center gap-4"
                     >
-                      <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 bg-pink-900/30 rounded-lg flex items-center justify-center flex-shrink-0 border border-pink-800/30">
                         <role.icon className="w-6 h-6 text-pink-600" />
                       </div>
                       <div>
                         <p className="font-semibold">{role.label}</p>
-                        <p className="text-sm text-muted-foreground">{role.description}</p>
+                        <p className="text-sm text-foreground/70">{role.description}</p>
                       </div>
                     </button>
                   ))}
@@ -127,7 +124,7 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
           {/* Step 2: Mobile Number */}
           {step === "mobile" && (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-pink-50 rounded-lg mb-4">
+              <div className="flex items-center gap-3 p-3 bg-pink-900/20 rounded-lg mb-4 border border-pink-800/30">
                 <div className="w-10 h-10 bg-pink-600 rounded-lg flex items-center justify-center flex-shrink-0">
                   {selectedRole === "patient" && <User className="w-5 h-5 text-white" />}
                   {selectedRole === "doctor" && <Stethoscope className="w-5 h-5 text-white" />}
@@ -147,7 +144,7 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
               <div>
                 <Label htmlFor="mobile">Mobile Number</Label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground/60" />
                   <Input
                     id="mobile"
                     type="tel"
@@ -158,7 +155,7 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
                     maxLength={10}
                   />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-foreground/60 mt-1">
                   📱 You will receive an OTP on this number
                 </p>
               </div>
@@ -176,7 +173,7 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
                   <div className="w-full border-t border-border"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-card text-muted-foreground">New User?</span>
+                  <span className="px-2 bg-card text-foreground/70">New User?</span>
                 </div>
               </div>
 
@@ -194,10 +191,10 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
           {step === "otp" && (
             <div className="space-y-4">
               <div className="text-center mb-4">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="w-16 h-16 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3 border border-green-800/30">
                   <Mail className="w-8 h-8 text-green-600" />
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-foreground/70">
                   OTP sent to <strong>+91 {mobileNumber}</strong>
                 </p>
                 <button 
@@ -219,7 +216,7 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
                   maxLength={6}
                   className="text-center text-2xl tracking-widest"
                 />
-                <p className="text-xs text-muted-foreground mt-1 text-center">
+                <p className="text-xs text-foreground/60 mt-1 text-center">
                   Demo OTP: <strong>123456</strong>
                 </p>
               </div>
@@ -244,7 +241,7 @@ export function LoginWithOTP({ onLogin, onBack, onRegister }: LoginWithOTPProps)
           )}
         </Card>
 
-        <p className="text-center text-sm text-muted-foreground mt-4">
+        <p className="text-center text-sm text-foreground/60 mt-4">
           🔒 Your data is secure and encrypted
         </p>
       </div>

@@ -56,7 +56,7 @@ export function Login({ onLogin, onBack }: LoginProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Button 
           variant="ghost" 

@@ -31,10 +31,10 @@ export function Contact({ onNavigate }: ContactProps) {
       <Navigation onNavigate={onNavigate} onGetStarted={() => onNavigate("login")} />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-pink-50 to-purple-50 py-20">
+      <section className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 py-20 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl mb-6">Get In Touch</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <h1 className="text-5xl mb-6 text-foreground font-bold">Get In Touch</h1>
+          <p className="text-xl text-foreground/80 max-w-3xl mx-auto font-medium">
             Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>
         </div>
@@ -139,7 +139,7 @@ export function Contact({ onNavigate }: ContactProps) {
                 </Card>
               </div>
 
-              <Card className="p-6 bg-gradient-to-br from-pink-50 to-purple-50">
+              <Card className="p-6 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-border">
                 <h3 className="mb-2">Business Hours</h3>
                 <p className="text-muted-foreground">
                   Monday - Friday: 9:00 AM - 6:00 PM IST<br />

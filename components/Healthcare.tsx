@@ -12,16 +12,11 @@ import {
   Activity, 
   Sparkles,
   MessageSquare,
-  Upload,
-  Play,
-  Languages,
-  Shield,
-  Clock,
-  Award,
+  Heart,
+  Stethoscope,
   Users,
   TrendingUp,
-  Heart,
-  Stethoscope
+  Award
 } from "lucide-react";
 
 interface HealthcareProps {
@@ -145,22 +140,22 @@ export function Healthcare({ onNavigate }: HealthcareProps) {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Navigation onNavigate={onNavigate} onGetStarted={() => onNavigate("login")} />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <section className="relative bg-gradient-to-br from-pink-900/20 via-purple-900/20 to-blue-900/20 py-24 overflow-hidden border-b border-border">
+        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
             <Badge className="mb-6 px-6 py-2 text-base bg-gradient-to-r from-pink-600 to-purple-600 text-white border-0">
               <Heart className="w-4 h-4 mr-2" />
               AI-Powered Healthcare Platform
             </Badge>
-            <h1 className="text-6xl mb-6 bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-6xl mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent font-bold">
               Your Complete Healthcare Solution
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-foreground/80 max-w-3xl mx-auto mb-8 font-medium">
               Experience next-generation healthcare with AI-powered diagnosis, telemedicine, medicine delivery, lab tests, and comprehensive health management - all in one platform
             </p>
             <div className="flex items-center justify-center gap-4">
@@ -176,14 +171,14 @@ export function Healthcare({ onNavigate }: HealthcareProps) {
           {/* Stats */}
           <div className="grid md:grid-cols-4 gap-6 mt-16">
             {stats.map((stat, index) => (
-              <Card key={index} className="p-6 text-center hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 bg-gradient-to-br from-pink-100 to-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Card key={index} className="p-6 text-center hover:shadow-lg transition-shadow bg-card border-border">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-900/30 to-purple-900/30 rounded-xl flex items-center justify-center mx-auto mb-3 border border-pink-800/30">
                   <stat.icon className="w-6 h-6 text-pink-600" />
                 </div>
-                <div className="text-3xl mb-1 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+                <div className="text-3xl mb-1 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent font-bold">
                   {stat.value}
                 </div>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
+                <p className="text-sm text-foreground/70 font-medium">{stat.label}</p>
               </Card>
             ))}
           </div>
@@ -191,29 +186,29 @@ export function Healthcare({ onNavigate }: HealthcareProps) {
       </section>
 
       {/* AI Features Grid */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl mb-4">Powerful AI Health Tools</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Powerful AI Health Tools</h2>
+            <p className="text-xl text-foreground/80 max-w-3xl mx-auto font-medium">
               Advanced artificial intelligence to help you understand your health better
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="p-6 hover:shadow-2xl transition-all duration-300 border-2 hover:border-pink-200">
+              <Card key={index} className="p-6 hover:shadow-2xl transition-all duration-300 border-2 hover:border-pink-500/50 bg-card border-border">
                 <div className={`w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mb-4 shadow-lg`}>
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl mb-3">{feature.title}</h3>
-                <p className="text-muted-foreground mb-4">{feature.description}</p>
+                <h3 className="text-xl mb-3 text-foreground font-semibold">{feature.title}</h3>
+                <p className="text-foreground/70 mb-4">{feature.description}</p>
                 
                 <div className="space-y-2 mb-4">
                   {feature.features.map((item, idx) => (
                     <div key={idx} className="flex items-start gap-2 text-sm">
                       <Sparkles className="w-4 h-4 text-pink-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-muted-foreground">{item}</span>
+                      <span className="text-foreground/80">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -234,11 +229,11 @@ export function Healthcare({ onNavigate }: HealthcareProps) {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl mb-4">How It Works</h2>
-            <p className="text-xl text-muted-foreground">
+            <h2 className="text-4xl mb-4 text-foreground font-bold">How It Works</h2>
+            <p className="text-xl text-foreground/80 font-medium">
               Get started in just 4 simple steps
             </p>
           </div>
@@ -246,15 +241,15 @@ export function Healthcare({ onNavigate }: HealthcareProps) {
           <div className="grid md:grid-cols-4 gap-8">
             {howItWorks.map((item, index) => (
               <div key={index} className="relative">
-                <Card className="p-6 text-center h-full hover:shadow-lg transition-shadow">
+                <Card className="p-6 text-center h-full hover:shadow-lg transition-shadow bg-card border-border">
                   <div className="w-16 h-16 bg-gradient-to-br from-pink-600 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4 shadow-lg">
                     {item.step}
                   </div>
-                  <div className="w-12 h-12 bg-gradient-to-br from-pink-100 to-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-900/30 to-purple-900/30 rounded-xl flex items-center justify-center mx-auto mb-4 border border-pink-800/30">
                     <item.icon className="w-6 h-6 text-pink-600" />
                   </div>
-                  <h3 className="mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
+                  <h3 className="mb-2 text-foreground font-semibold">{item.title}</h3>
+                  <p className="text-sm text-foreground/70">{item.description}</p>
                 </Card>
                 {index < howItWorks.length - 1 && (
                   <div className="hidden md:block absolute top-1/4 -right-4 w-8 h-0.5 bg-gradient-to-r from-pink-600 to-purple-600"></div>
@@ -266,22 +261,22 @@ export function Healthcare({ onNavigate }: HealthcareProps) {
       </section>
 
       {/* Services Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl mb-4">Complete Healthcare Services</h2>
-            <p className="text-xl text-muted-foreground">
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Complete Healthcare Services</h2>
+            <p className="text-xl text-foreground/80 font-medium">
               Everything you need for better health management
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="p-8 text-center hover:shadow-2xl transition-all">
+            <Card className="p-8 text-center hover:shadow-2xl transition-all bg-card border-border">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Stethoscope className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl mb-3">Doctor Consultations</h3>
-              <p className="text-muted-foreground mb-6">
+              <h3 className="text-2xl mb-3 text-foreground font-semibold">Doctor Consultations</h3>
+              <p className="text-foreground/70 mb-6">
                 Book in-person or video consultations with verified doctors
               </p>
               <Button className="w-full" onClick={() => onNavigate("login")}>
@@ -289,12 +284,12 @@ export function Healthcare({ onNavigate }: HealthcareProps) {
               </Button>
             </Card>
 
-            <Card className="p-8 text-center hover:shadow-2xl transition-all">
+            <Card className="p-8 text-center hover:shadow-2xl transition-all bg-card border-border">
               <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Heart className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl mb-3">Medicine Delivery</h3>
-              <p className="text-muted-foreground mb-6">
+              <h3 className="text-2xl mb-3 text-foreground font-semibold">Medicine Delivery</h3>
+              <p className="text-foreground/70 mb-6">
                 Order medicines online with doorstep delivery
               </p>
               <Button className="w-full" onClick={() => onNavigate("medicine")}>
@@ -302,12 +297,12 @@ export function Healthcare({ onNavigate }: HealthcareProps) {
               </Button>
             </Card>
 
-            <Card className="p-8 text-center hover:shadow-2xl transition-all">
+            <Card className="p-8 text-center hover:shadow-2xl transition-all bg-card border-border">
               <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Activity className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl mb-3">Lab Tests at Home</h3>
-              <p className="text-muted-foreground mb-6">
+              <h3 className="text-2xl mb-3 text-foreground font-semibold">Lab Tests at Home</h3>
+              <p className="text-foreground/70 mb-6">
                 Book lab tests with home sample collection
               </p>
               <Button className="w-full" onClick={() => onNavigate("login")}>
@@ -322,7 +317,7 @@ export function Healthcare({ onNavigate }: HealthcareProps) {
       <section className="py-20 bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 relative z-10">
-          <h2 className="text-5xl mb-4">Ready to Get Started?</h2>
+          <h2 className="text-5xl mb-4 text-white font-bold">Ready to Get Started?</h2>
           <p className="text-xl mb-8 text-pink-100">
             Join 50,000+ patients experiencing better healthcare with E-Clinic
           </p>

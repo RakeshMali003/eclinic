@@ -16,12 +16,23 @@ import {
   FlaskConical,
   Tag,
   Crown,
+  Sparkles,
+  ArrowRight,
+  Zap,
+  Shield
 } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Navigation } from "./Navigation";
 import { Footer } from "./Footer";
 import { PageView } from "../App";
 import { MedicineSection } from "./MedicineSection";
+import { GradientText } from "./ui/gradient-text";
+import { AnimatedButton } from "./ui/animated-button";
+import { ResponsiveGrid, ResponsiveContainer, ResponsiveFlex } from "./ui/responsive-grid";
+import { ResponsiveHeading, ResponsiveText } from "./ui/responsive-text";
+import { ParticleBackground, FloatingElements } from "./ui/particle-background";
+import { MagneticButton, GlowingCard, ParallaxSection } from "./ui/magnetic-button";
+import { TextReveal, Typewriter } from "./ui/text-reveal";
 
 interface HomeProps {
   onGetStarted: () => void;
@@ -30,6 +41,8 @@ interface HomeProps {
 
 export function Home({ onGetStarted, onNavigate }: HomeProps) {
   const [showPromoNav, setShowPromoNav] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,8 +50,18 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
       setShowPromoNav(scrollPercentage > 10);
     };
 
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('mousemove', handleMouseMove);
+    setIsLoaded(true);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
   const promoItems = [
@@ -162,13 +185,13 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
       <Navigation onGetStarted={onGetStarted} onNavigate={onNavigate} />
 
       {/* Promotional Sticky Nav (appears after 10% scroll) */}
       {showPromoNav && (
-        <div className="fixed top-0 left-0 right-0 bg-white border-b shadow-md z-40 animate-in slide-in-from-top">
+        <div className="fixed top-0 left-0 right-0 bg-card border-b border-border shadow-md z-40 animate-in slide-in-from-top">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center gap-3 py-2 overflow-x-auto">
               {promoItems.map((item, index) => (
@@ -191,85 +214,130 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
       )}
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-6xl mb-6">
-                Your health, our priority. <span className="text-primary">Digitally.</span>
-              </h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Connect patients, doctors, and clinics on one unified platform. Get AI-powered health insights, telemedicine, and seamless care management.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Button size="lg" onClick={onGetStarted}>
-                  Book Consult
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => onNavigate("features")}>
-                  Explore Features
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => onNavigate("how-it-works")}>
-                  Learn More
-                </Button>
+      <section className="relative bg-gradient-to-br from-pink-900/20 via-purple-900/20 to-blue-900/20 py-12 sm:py-16 lg:py-20 border-b border-border overflow-hidden">
+        {/* Advanced Background Effects */}
+        <ParticleBackground particleCount={30} />
+        <FloatingElements>
+          <div className="absolute inset-0 bg-gradient-to-br from-pink-900/10 via-purple-900/10 to-blue-900/10"></div>
+        </FloatingElements>
+        
+        <ResponsiveContainer>
+          <ResponsiveFlex 
+            direction={{ default: "col", lg: "row" }}
+            justify={{ default: "center", lg: "between" }}
+            align={{ default: "center", lg: "start" }}
+            gap="gap-8 lg:gap-12"
+            className="relative z-10"
+          >
+            <div className={`space-y-6 sm:space-y-8 text-center lg:text-left ${isLoaded ? 'animate-fade-in' : 'opacity-0'} w-full lg:w-auto`}>
+              <div className="space-y-4">
+                <TextReveal delay={200}>
+                  <Badge className="bg-gradient-to-r from-pink-500 to-purple-600 text-white border-0 px-3 sm:px-4 py-2 text-xs sm:text-sm shadow-lg animate-pulse-glow">
+                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                    AI-Powered Healthcare Platform
+                  </Badge>
+                </TextReveal>
+                <TextReveal delay={400}>
+                  <ResponsiveHeading level={1} align={{ default: "center", lg: "left" }} className="mb-4 sm:mb-6 leading-tight">
+                    Your health, our priority. <GradientText colors={["#ec4899", "#a855f7", "#3b82f6"]}>Digitally.</GradientText>
+                  </ResponsiveHeading>
+                </TextReveal>
+                <TextReveal delay={600}>
+                  <ResponsiveText 
+                    size={{ default: "base", sm: "lg" }} 
+                    align={{ default: "center", lg: "left" }}
+                    className="mb-6 sm:mb-8 font-medium leading-relaxed text-foreground/80"
+                  >
+                    Connect patients, doctors, and clinics on one unified platform. Get AI-powered health insights, telemedicine, and seamless care management.
+                  </ResponsiveText>
+                </TextReveal>
               </div>
-              <div className="flex items-center gap-8 mt-8">
-                <div>
-                  <div className="flex items-center gap-1 mb-1">
+              
+              <ResponsiveFlex 
+                direction={{ default: "col", sm: "row" }}
+                justify={{ default: "center", lg: "start" }}
+                gap="gap-3 sm:gap-4"
+                className="w-full sm:w-auto"
+              >
+                <MagneticButton variant="glow" onClick={onGetStarted} className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4">
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  Book Consult
+                </MagneticButton>
+                <MagneticButton variant="outline" onClick={() => onNavigate("features")} className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4">
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  Explore Features
+                </MagneticButton>
+                <MagneticButton variant="outline" onClick={() => onNavigate("how-it-works")} className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4">
+                  Learn More
+                </MagneticButton>
+              </ResponsiveFlex>
+              
+              <GlowingCard className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 mt-6 sm:mt-8 p-4 sm:p-6 bg-card/50 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-border">
+                <div className="text-center sm:text-left">
+                  <div className="flex items-center justify-center sm:justify-start gap-1 mb-1">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400 animate-pulse" />
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground">1000+ doctors trust us</p>
+                  <ResponsiveText size={{ default: "xs", sm: "sm" }} className="text-foreground/70">
+                    1000+ doctors trust us
+                  </ResponsiveText>
                 </div>
-                <div className="h-10 w-px bg-border" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Available in</p>
-                  <p>English & Hindi</p>
+                <div className="hidden sm:block h-8 w-px bg-border"></div>
+                <div className="text-center sm:text-left">
+                  <ResponsiveText size={{ default: "xs", sm: "sm" }} className="text-foreground/70">
+                    Available in
+                  </ResponsiveText>
+                  <p className="font-semibold text-sm sm:text-base">English & Hindi</p>
                 </div>
-              </div>
+              </GlowingCard>
             </div>
-            <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <ImageWithFallback 
-                  src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2N0b3IlMjBwYXRpZW50JTIwY29uc3VsdGF0aW9ufGVufDF8fHx8MTc2MjMxNjYxN3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                  alt="Doctor consultation"
-                  className="w-full h-auto"
-                />
-              </div>
-              {/* Floating cards */}
-              <Card className="absolute -bottom-6 -left-6 p-4 bg-white shadow-xl">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
-                    <Heart className="w-6 h-6 text-pink-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Health Score</p>
-                    <p className="text-xl text-green-600">95%</p>
-                  </div>
+            <div className="relative w-full lg:w-auto">
+              <ParallaxSection speed={0.3}>
+                <div className="relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl">
+                  <ImageWithFallback 
+                    src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2N0b3IlMjBwYXRpZW50JTIwY29uc3VsdGF0aW9ufGVufDF8fHx8MTc2MjMxNjYxN3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                    alt="Doctor consultation"
+                    className="w-full h-auto max-w-md lg:max-w-full"
+                  />
                 </div>
-              </Card>
+                {/* Floating cards */}
+                <GlowingCard className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 p-3 sm:p-4 bg-card border-border shadow-xl hidden sm:block">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-8 h-8 sm:w-12 sm:h-12 bg-pink-900/30 rounded-full flex items-center justify-center border border-pink-800/30">
+                      <Heart className="w-4 h-4 sm:w-6 sm:h-6 text-pink-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-foreground/70">Health Score</p>
+                      <p className="text-lg sm:text-xl text-green-600">95%</p>
+                    </div>
+                  </div>
+                </GlowingCard>
+              </ParallaxSection>
             </div>
-          </div>
-        </div>
+          </ResponsiveFlex>
+        </ResponsiveContainer>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-12 sm:py-16 lg:py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl mb-4">Core Features</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+            <h2 className="text-3xl sm:text-4xl mb-4 text-foreground font-bold">Core Features</h2>
+            <p className="text-base sm:text-xl text-foreground/80 max-w-2xl mx-auto font-medium">
               Everything you need to deliver exceptional healthcare experiences
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-6 lg:gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-pink-600" />
+              <Card key={index} className="p-4 sm:p-6 hover:shadow-xl transition-shadow bg-card border-border">
+                <div className="text-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-pink-900/30 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4 border border-pink-800/30">
+                    <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-pink-600" />
+                  </div>
+                  <h3 className="text-lg sm:text-xl mb-2 text-foreground font-semibold text-center">{feature.title}</h3>
+                  <p className="text-sm sm:text-base text-foreground/70">{feature.description}</p>
                 </div>
-                <h3 className="mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
               </Card>
             ))}
           </div>
@@ -277,12 +345,12 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
       </section>
 
       {/* AI Features Showcase */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl mb-6">AI-Powered Intelligence</h2>
-              <p className="text-xl text-muted-foreground mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="space-y-6 text-center lg:text-left">
+              <h2 className="text-3xl sm:text-4xl mb-4 sm:mb-6 text-foreground font-bold">AI-Powered Intelligence</h2>
+              <p className="text-base sm:text-xl text-foreground/80 mb-6 sm:mb-8 font-medium">
                 Our advanced AI transforms complex medical data into simple, understandable insights
               </p>
               <div className="space-y-4">
@@ -297,7 +365,7 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
                     <div className="w-6 h-6 bg-pink-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Check className="w-4 h-4 text-white" />
                     </div>
-                    <p>{item}</p>
+                    <p className="text-foreground/90">{item}</p>
                   </div>
                 ))}
               </div>
@@ -306,7 +374,7 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
               <ImageWithFallback 
                 src="https://images.unsplash.com/photo-1758202292826-c40e172eed1c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwdGVjaG5vbG9neSUyMEFJfGVufDF8fHx8MTc2MjQzNjkyOXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
                 alt="AI Medical Technology"
-                className="rounded-2xl shadow-2xl w-full"
+                className="rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-md lg:max-w-full"
               />
             </div>
           </div>
@@ -314,28 +382,28 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-white">
+      <section className="py-12 sm:py-16 lg:py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl mb-4">Built for Everyone</h2>
-            <p className="text-xl text-muted-foreground">
+          <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+            <h2 className="text-3xl sm:text-4xl mb-4 text-foreground font-bold">Built for Everyone</h2>
+            <p className="text-base sm:text-xl text-foreground/80 font-medium">
               Tailored experiences for every user type
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {benefits.map((benefit, index) => (
-              <Card key={index} className="p-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6">
-                  {index === 0 && <Heart className="w-8 h-8 text-white" />}
-                  {index === 1 && <Stethoscope className="w-8 h-8 text-white" />}
-                  {index === 2 && <Building2 className="w-8 h-8 text-white" />}
+              <Card key={index} className="p-6 sm:p-8 bg-card border-border">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
+                  {index === 0 && <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-white" />}
+                  {index === 1 && <Stethoscope className="w-6 h-6 sm:w-8 sm:h-8 text-white" />}
+                  {index === 2 && <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-white" />}
                 </div>
-                <h3 className="mb-4">{benefit.role}</h3>
-                <ul className="space-y-3">
+                <h3 className="mb-3 sm:mb-4 text-foreground font-semibold text-center">{benefit.role}</h3>
+                <ul className="space-y-2 sm:space-y-3">
                   {benefit.items.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-muted-foreground">
+                    <li key={idx} className="flex items-center gap-2 text-foreground/80">
                       <Check className="w-4 h-4 text-pink-600 flex-shrink-0" />
-                      {item}
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -346,11 +414,11 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
       </section>
 
       {/* Shop by Categories */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">Shop by Categories</h2>
-            <p className="text-xl text-muted-foreground">
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Shop by Categories</h2>
+            <p className="text-xl text-foreground/80 font-medium">
               Browse our curated health and wellness collections
             </p>
           </div>
@@ -359,7 +427,7 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
               <Button
                 key={index}
                 variant="outline"
-                className="h-auto py-6 flex-col gap-2 bg-white hover:bg-accent hover:shadow-lg transition-all"
+                className="h-auto py-6 flex-col gap-2 bg-card hover:bg-accent hover:shadow-lg transition-all border-border"
                 onClick={() => {
                   if (item.name === "Medicine") onNavigate("medicine");
                   else if (item.name === "Doctor Consult") onNavigate("doctor-consult");
@@ -389,12 +457,12 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
       </section>
 
       {/* Doctors List */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-4xl mb-2">Consult Top Doctors</h2>
-              <p className="text-xl text-muted-foreground">
+              <h2 className="text-4xl mb-2 text-foreground font-bold">Consult Top Doctors</h2>
+              <p className="text-xl text-foreground/80 font-medium">
                 Book appointments with verified specialists
               </p>
             </div>
@@ -409,7 +477,7 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {doctors.map((doctor, index) => (
-              <Card key={index} className="p-6 hover:shadow-xl transition-shadow">
+              <Card key={index} className="p-6 hover:shadow-xl transition-shadow bg-card border-border">
                 <div className="flex flex-col items-center text-center mb-4">
                   <div className="relative mb-4">
                     <ImageWithFallback 
@@ -423,18 +491,18 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
                       </Badge>
                     </div>
                   </div>
-                  <h3 className="mb-1">{doctor.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">{doctor.specialty}</p>
+                  <h3 className="mb-1 text-foreground font-semibold">{doctor.name}</h3>
+                  <p className="text-sm text-foreground/70 mb-2">{doctor.specialty}</p>
                   <div className="flex items-center gap-1 mb-2">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span>{doctor.rating}</span>
-                    <span className="text-xs text-muted-foreground">({doctor.consultations}+)</span>
+                    <span className="text-xs text-foreground/60">({doctor.consultations}+)</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">{doctor.experience} experience</p>
+                  <p className="text-xs text-foreground/60">{doctor.experience} experience</p>
                 </div>
                 <div className="border-t pt-4 mt-4">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm text-muted-foreground">Consultation Fee</span>
+                    <span className="text-sm text-foreground/70">Consultation Fee</span>
                     <span className="text-lg text-pink-600">₹{doctor.fee}</span>
                   </div>
                   <Button className="w-full" onClick={onGetStarted}>
@@ -452,23 +520,23 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
       <MedicineSection onNavigate={onNavigate} />
 
       {/* Testimonials */}
-      <section className="py-20 bg-gradient-to-br from-purple-50 to-pink-50">
+      <section className="py-20 bg-gradient-to-br from-purple-900/10 to-pink-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl mb-4">Trusted by Healthcare Professionals</h2>
-            <p className="text-xl text-muted-foreground">
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Trusted by Healthcare Professionals</h2>
+            <p className="text-xl text-foreground/80 font-medium">
               See what our users have to say
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="p-6">
+              <Card key={index} className="p-6 bg-card border-border">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <p className="text-muted-foreground mb-6">"{testimonial.content}"</p>
+                <p className="text-foreground/70 mb-6">"{testimonial.content}"</p>
                 <div className="flex items-center gap-3">
                   <ImageWithFallback 
                     src={testimonial.avatar}
@@ -476,8 +544,8 @@ export function Home({ onGetStarted, onNavigate }: HomeProps) {
                     className="w-12 h-12 rounded-full"
                   />
                   <div>
-                    <p>{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    <p className="text-foreground font-semibold">{testimonial.name}</p>
+                    <p className="text-sm text-foreground/60">{testimonial.role}</p>
                   </div>
                 </div>
               </Card>

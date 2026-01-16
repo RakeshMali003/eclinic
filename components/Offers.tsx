@@ -63,17 +63,17 @@ export function Offers({ onNavigate }: OffersProps) {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Navigation onNavigate={onNavigate} onGetStarted={() => onNavigate("login")} />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-pink-50 to-purple-50 py-20">
+      <section className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 py-20 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full mb-6">
             <Tag className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-5xl mb-6">Special Offers & Deals</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+          <h1 className="text-5xl mb-6 font-bold text-foreground">Special Offers & Deals</h1>
+          <p className="text-xl text-foreground/80 max-w-3xl mx-auto mb-8 font-medium">
             Save more with our exclusive offers and partner discounts. Limited time deals on healthcare services!
           </p>
 
@@ -81,31 +81,31 @@ export function Offers({ onNavigate }: OffersProps) {
           <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto mt-12">
             <div>
               <div className="text-4xl mb-2">70%</div>
-              <p className="text-muted-foreground">Max Discount</p>
+              <p className="text-foreground/70">Max Discount</p>
             </div>
             <div>
               <div className="text-4xl mb-2">₹5000+</div>
-              <p className="text-muted-foreground">Avg. Savings</p>
+              <p className="text-foreground/70">Avg. Savings</p>
             </div>
             <div>
               <div className="text-4xl mb-2">20+</div>
-              <p className="text-muted-foreground">Active Offers</p>
+              <p className="text-foreground/70">Active Offers</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Main Offers */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">Exclusive Offers</h2>
-            <p className="text-xl text-muted-foreground">Limited time deals you don't want to miss</p>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Exclusive Offers</h2>
+            <p className="text-xl text-foreground/80 font-medium">Limited time deals you don't want to miss</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {offers.map((offer, index) => (
-              <Card key={index} className="overflow-hidden hover:shadow-2xl transition-all">
+              <Card key={index} className="overflow-hidden hover:shadow-2xl transition-all bg-card border-border">
                 <div className={`bg-gradient-to-r ${offer.color} p-6 text-white relative`}>
                   <Badge className="absolute top-4 right-4 bg-white text-gray-900">{offer.badge}</Badge>
                   <div className="flex items-start justify-between mb-4">
@@ -120,8 +120,8 @@ export function Offers({ onNavigate }: OffersProps) {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">Promo Code</p>
-                      <p className="text-lg font-mono bg-pink-50 px-4 py-2 rounded">{offer.code}</p>
+                      <p className="text-sm text-foreground/70 mb-1">Promo Code</p>
+                      <p className="text-lg font-mono bg-pink-900/20 px-4 py-2 rounded border border-pink-800/30">{offer.code}</p>
                     </div>
                     <Button variant="outline" onClick={() => {
                       navigator.clipboard.writeText(offer.code);
@@ -130,7 +130,7 @@ export function Offers({ onNavigate }: OffersProps) {
                       Copy Code
                     </Button>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-foreground/70">
                     <Clock className="w-4 h-4" />
                     <span>Valid till: {offer.validTill}</span>
                   </div>
@@ -142,20 +142,20 @@ export function Offers({ onNavigate }: OffersProps) {
       </section>
 
       {/* Seasonal Offers */}
-      <section className="py-20 bg-gradient-to-br from-purple-50 to-pink-50">
+      <section className="py-20 bg-gradient-to-br from-purple-900/10 to-pink-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">Seasonal Offers</h2>
-            <p className="text-xl text-muted-foreground">Mark your calendar for these special deals</p>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Seasonal Offers</h2>
+            <p className="text-xl text-foreground/80 font-medium">Mark your calendar for these special deals</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {seasonalOffers.map((offer, index) => (
-              <Card key={index} className="p-6 text-center hover:shadow-lg transition-all">
+              <Card key={index} className="p-6 text-center hover:shadow-lg transition-all bg-card border-border">
                 <Sparkles className="w-10 h-10 text-pink-600 mx-auto mb-4" />
-                <h3 className="mb-2">{offer.title}</h3>
+                <h3 className="mb-2 text-foreground font-semibold">{offer.title}</h3>
                 <Badge className="mb-3 bg-pink-600">{offer.discount}</Badge>
-                <p className="text-sm text-muted-foreground">{offer.valid}</p>
+                <p className="text-sm text-foreground/70">{offer.valid}</p>
               </Card>
             ))}
           </div>
@@ -163,57 +163,57 @@ export function Offers({ onNavigate }: OffersProps) {
       </section>
 
       {/* How to Use */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">How to Redeem Offers</h2>
-            <p className="text-xl text-muted-foreground">Follow these simple steps</p>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">How to Redeem Offers</h2>
+            <p className="text-xl text-foreground/80 font-medium">Follow these simple steps</p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-6">
-            <Card className="p-6 text-center">
-              <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Card className="p-6 text-center bg-card border-border">
+              <div className="w-12 h-12 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-pink-800/30">
                 <span className="text-xl text-pink-600">1</span>
               </div>
-              <h3 className="mb-2">Choose Offer</h3>
-              <p className="text-sm text-muted-foreground">Select the offer that suits you best</p>
+              <h3 className="mb-2 text-foreground font-semibold">Choose Offer</h3>
+              <p className="text-sm text-foreground/70">Select the offer that suits you best</p>
             </Card>
 
-            <Card className="p-6 text-center">
-              <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Card className="p-6 text-center bg-card border-border">
+              <div className="w-12 h-12 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-pink-800/30">
                 <span className="text-xl text-pink-600">2</span>
               </div>
-              <h3 className="mb-2">Copy Code</h3>
-              <p className="text-sm text-muted-foreground">Click to copy the promo code</p>
+              <h3 className="mb-2 text-foreground font-semibold">Copy Code</h3>
+              <p className="text-sm text-foreground/70">Click to copy the promo code</p>
             </Card>
 
-            <Card className="p-6 text-center">
-              <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Card className="p-6 text-center bg-card border-border">
+              <div className="w-12 h-12 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-pink-800/30">
                 <span className="text-xl text-pink-600">3</span>
               </div>
-              <h3 className="mb-2">Apply at Checkout</h3>
-              <p className="text-sm text-muted-foreground">Paste code during payment</p>
+              <h3 className="mb-2 text-foreground font-semibold">Apply at Checkout</h3>
+              <p className="text-sm text-foreground/70">Paste code during payment</p>
             </Card>
 
-            <Card className="p-6 text-center">
-              <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Card className="p-6 text-center bg-card border-border">
+              <div className="w-12 h-12 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-pink-800/30">
                 <span className="text-xl text-pink-600">4</span>
               </div>
-              <h3 className="mb-2">Save Money</h3>
-              <p className="text-sm text-muted-foreground">Enjoy your discount!</p>
+              <h3 className="mb-2 text-foreground font-semibold">Save Money</h3>
+              <p className="text-sm text-foreground/70">Enjoy your discount!</p>
             </Card>
           </div>
         </div>
       </section>
 
       {/* Loyalty Program */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <Trophy className="w-16 h-16 text-yellow-500 mb-6" />
-              <h2 className="text-4xl mb-4">E-Clinic Loyalty Program</h2>
-              <p className="text-xl text-muted-foreground mb-6">
+              <h2 className="text-4xl mb-4 text-foreground font-bold">E-Clinic Loyalty Program</h2>
+              <p className="text-xl text-foreground/80 mb-6 font-medium">
                 Earn points on every purchase and unlock exclusive rewards
               </p>
               <ul className="space-y-3 mb-8">
@@ -226,7 +226,7 @@ export function Offers({ onNavigate }: OffersProps) {
                 ].map((benefit, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <Star className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-                    <span>{benefit}</span>
+                    <span className="text-foreground/90">{benefit}</span>
                   </li>
                 ))}
               </ul>
@@ -236,25 +236,25 @@ export function Offers({ onNavigate }: OffersProps) {
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <Card className="p-6 text-center">
+              <Card className="p-6 text-center bg-card border-border">
                 <Zap className="w-10 h-10 text-orange-500 mx-auto mb-3" />
                 <div className="text-3xl mb-2">500</div>
-                <p className="text-sm text-muted-foreground">Points = ₹50 OFF</p>
+                <p className="text-sm text-foreground/70">Points = ₹50 OFF</p>
               </Card>
-              <Card className="p-6 text-center">
+              <Card className="p-6 text-center bg-card border-border">
                 <Gift className="w-10 h-10 text-pink-500 mx-auto mb-3" />
                 <div className="text-3xl mb-2">1000</div>
-                <p className="text-sm text-muted-foreground">Points = ₹120 OFF</p>
+                <p className="text-sm text-foreground/70">Points = ₹120 OFF</p>
               </Card>
-              <Card className="p-6 text-center">
+              <Card className="p-6 text-center bg-card border-border">
                 <Trophy className="w-10 h-10 text-yellow-500 mx-auto mb-3" />
                 <div className="text-3xl mb-2">2500</div>
-                <p className="text-sm text-muted-foreground">Points = ₹350 OFF</p>
+                <p className="text-sm text-foreground/70">Points = ₹350 OFF</p>
               </Card>
-              <Card className="p-6 text-center">
+              <Card className="p-6 text-center bg-card border-border">
                 <Sparkles className="w-10 h-10 text-purple-500 mx-auto mb-3" />
                 <div className="text-3xl mb-2">5000</div>
-                <p className="text-sm text-muted-foreground">Points = ₹800 OFF</p>
+                <p className="text-sm text-foreground/70">Points = ₹800 OFF</p>
               </Card>
             </div>
           </div>

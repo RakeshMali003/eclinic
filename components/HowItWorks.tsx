@@ -61,10 +61,10 @@ export function HowItWorks({ onNavigate }: HowItWorksProps) {
       <Navigation onNavigate={onNavigate} onGetStarted={() => onNavigate("login")} />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-pink-50 to-purple-50 py-20">
+      <section className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 py-20 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl mb-6">How E-Clinic Works</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <h1 className="text-5xl mb-6 text-foreground font-bold">How E-Clinic Works</h1>
+          <p className="text-xl text-foreground/80 max-w-3xl mx-auto font-medium">
             From registration to continuous care - see how E-Clinic transforms the healthcare journey
           </p>
         </div>
@@ -108,10 +108,10 @@ export function HowItWorks({ onNavigate }: HowItWorksProps) {
       </section>
 
       {/* Video/Demo Section */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl mb-6">See It In Action</h2>
-          <p className="text-xl text-muted-foreground mb-8">
+          <h2 className="text-4xl mb-6 text-foreground font-bold">See It In Action</h2>
+          <p className="text-xl text-foreground/80 mb-8 font-medium">
             Watch how E-Clinic simplifies healthcare management
           </p>
           <Card className="overflow-hidden shadow-2xl aspect-video bg-gray-900 flex items-center justify-center">
@@ -220,10 +220,10 @@ export function HowItWorks({ onNavigate }: HowItWorksProps) {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">Trusted by Healthcare Leaders</h2>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Trusted by Healthcare Leaders</h2>
             <p className="text-xl text-muted-foreground">Real impact on healthcare delivery</p>
           </div>
 

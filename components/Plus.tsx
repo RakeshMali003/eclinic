@@ -37,19 +37,19 @@ export function Plus({ onNavigate }: PlusProps) {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Navigation onNavigate={onNavigate} onGetStarted={() => onNavigate("login")} />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-yellow-50 via-pink-50 to-purple-50 py-20">
+      <section className="bg-gradient-to-br from-yellow-900/20 via-pink-900/20 to-purple-900/20 py-20 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mb-6">
                 <Crown className="w-10 h-10 text-white" />
               </div>
-              <h1 className="text-5xl mb-6">E-Clinic PLUS</h1>
-              <p className="text-xl text-muted-foreground mb-8">
+              <h1 className="text-5xl mb-6 font-bold text-foreground">E-Clinic PLUS</h1>
+              <p className="text-xl text-foreground/80 mb-8 font-medium">
                 Premium membership with exclusive benefits, unlimited access, and VIP healthcare experience
               </p>
               <Badge className="text-lg px-6 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 mb-8">
@@ -60,19 +60,19 @@ export function Plus({ onNavigate }: PlusProps) {
               <div className="grid grid-cols-2 gap-4 mb-8">
                 <div className="flex items-center gap-2">
                   <Check className="w-5 h-5 text-green-600" />
-                  <span>Free Delivery</span>
+                  <span className="text-foreground/90">Free Delivery</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-5 h-5 text-green-600" />
-                  <span>Priority Support</span>
+                  <span className="text-foreground/90">Priority Support</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-5 h-5 text-green-600" />
-                  <span>Unlimited AI</span>
+                  <span className="text-foreground/90">Unlimited AI</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-5 h-5 text-green-600" />
-                  <span>2x Points</span>
+                  <span className="text-foreground/90">2x Points</span>
                 </div>
               </div>
 
@@ -82,11 +82,11 @@ export function Plus({ onNavigate }: PlusProps) {
               </Button>
             </div>
 
-            <div className="bg-white rounded-2xl p-8 shadow-2xl">
+            <div className="bg-card rounded-2xl p-8 shadow-2xl border-border">
               <div className="text-center mb-6">
                 <Badge className="bg-yellow-500 mb-4">Most Popular</Badge>
-                <h2 className="text-4xl mb-2">₹999<span className="text-lg text-muted-foreground">/month</span></h2>
-                <p className="text-muted-foreground">or ₹9,999/year (Save ₹2,000)</p>
+                <h2 className="text-4xl mb-2 text-foreground">₹999<span className="text-lg text-foreground/70">/month</span></h2>
+                <p className="text-foreground/80">or ₹9,999/year (Save ₹2,000)</p>
               </div>
 
               <div className="space-y-3">
@@ -95,7 +95,7 @@ export function Plus({ onNavigate }: PlusProps) {
                     <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <div>
                       <span className="font-medium">{benefit.title}</span>
-                      <p className="text-sm text-muted-foreground">{benefit.desc}</p>
+                      <p className="text-sm text-foreground/70">{benefit.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -104,7 +104,7 @@ export function Plus({ onNavigate }: PlusProps) {
               <Button className="w-full mt-6" size="lg" onClick={() => onNavigate("login")}>
                 Start 30-Day Free Trial
               </Button>
-              <p className="text-sm text-center text-muted-foreground mt-4">
+              <p className="text-sm text-center text-foreground/60 mt-4">
                 Cancel anytime • No commitment
               </p>
             </div>
@@ -113,21 +113,21 @@ export function Plus({ onNavigate }: PlusProps) {
       </section>
 
       {/* All Benefits Grid */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">Complete Premium Benefits</h2>
-            <p className="text-xl text-muted-foreground">Everything you need for the ultimate healthcare experience</p>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Complete Premium Benefits</h2>
+            <p className="text-xl text-foreground/80 font-medium">Everything you need for the ultimate healthcare experience</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
-              <Card key={index} className="p-6 hover:shadow-lg transition-all">
-                <div className="w-12 h-12 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-lg flex items-center justify-center mb-4">
+              <Card key={index} className="p-6 hover:shadow-lg transition-all bg-card border-border">
+                <div className="w-12 h-12 bg-gradient-to-br from-yellow-900/30 to-orange-900/30 rounded-lg flex items-center justify-center mb-4 border border-yellow-800/30">
                   <benefit.icon className="w-6 h-6 text-orange-600" />
                 </div>
-                <h3 className="mb-2">{benefit.title}</h3>
-                <p className="text-muted-foreground">{benefit.desc}</p>
+                <h3 className="mb-2 text-foreground font-semibold">{benefit.title}</h3>
+                <p className="text-foreground/70">{benefit.desc}</p>
               </Card>
             ))}
           </div>
@@ -135,21 +135,21 @@ export function Plus({ onNavigate }: PlusProps) {
       </section>
 
       {/* Comparison Table */}
-      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-pink-900/10 to-purple-900/10 border-b border-border">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">Free vs PLUS</h2>
-            <p className="text-xl text-muted-foreground">See what you get with E-Clinic PLUS</p>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">Free vs PLUS</h2>
+            <p className="text-xl text-foreground/80 font-medium">See what you get with E-Clinic PLUS</p>
           </div>
 
           <Card className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-yellow-50 to-orange-50">
+                <thead className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20">
                   <tr>
                     <th className="text-left p-4">Feature</th>
                     <th className="text-center p-4">Free</th>
-                    <th className="text-center p-4 bg-gradient-to-r from-yellow-100 to-orange-100">
+                    <th className="text-center p-4 bg-gradient-to-r from-yellow-900/30 to-orange-900/30">
                       <Crown className="w-5 h-5 inline mr-2" />
                       PLUS
                     </th>
@@ -159,7 +159,7 @@ export function Plus({ onNavigate }: PlusProps) {
                   {comparisons.map((item, idx) => (
                     <tr key={idx} className="border-t">
                       <td className="p-4">{item.feature}</td>
-                      <td className="p-4 text-center text-muted-foreground">{item.free}</td>
+                      <td className="p-4 text-center text-foreground/70">{item.free}</td>
                       <td className="p-4 text-center font-semibold text-orange-600">{item.plus}</td>
                     </tr>
                   ))}
@@ -171,11 +171,11 @@ export function Plus({ onNavigate }: PlusProps) {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">What PLUS Members Say</h2>
-            <p className="text-xl text-muted-foreground">Join thousands of satisfied premium members</p>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">What PLUS Members Say</h2>
+            <p className="text-xl text-foreground/80 font-medium">Join thousands of satisfied premium members</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -199,16 +199,16 @@ export function Plus({ onNavigate }: PlusProps) {
                 rating: 5
               }
             ].map((testimonial, index) => (
-              <Card key={index} className="p-6">
+              <Card key={index} className="p-6 bg-card border-border">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <p className="text-muted-foreground mb-4">"{testimonial.content}"</p>
+                <p className="text-foreground/70 mb-4">"{testimonial.content}"</p>
                 <div>
-                  <p className="font-semibold">{testimonial.name}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                  <p className="font-semibold text-foreground">{testimonial.name}</p>
+                  <p className="text-sm text-foreground/60">{testimonial.role}</p>
                 </div>
               </Card>
             ))}
@@ -217,14 +217,14 @@ export function Plus({ onNavigate }: PlusProps) {
       </section>
 
       {/* ROI Calculator */}
-      <section className="py-20 bg-gradient-to-br from-yellow-50 to-orange-50">
+      <section className="py-20 bg-gradient-to-br from-yellow-900/10 to-orange-900/10 border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">PLUS Pays for Itself</h2>
-            <p className="text-xl text-muted-foreground">See how much you can save</p>
+            <h2 className="text-4xl mb-4 text-foreground font-bold">PLUS Pays for Itself</h2>
+            <p className="text-xl text-foreground/80 font-medium">See how much you can save</p>
           </div>
 
-          <Card className="p-8">
+          <Card className="p-8 bg-card border-border">
             <div className="space-y-6">
               <div className="flex justify-between items-center pb-4 border-b">
                 <span>Monthly medicine orders (avg ₹2000)</span>
@@ -242,17 +242,17 @@ export function Plus({ onNavigate }: PlusProps) {
                 <span className="font-semibold">Total Monthly Savings</span>
                 <span className="text-green-600 font-semibold text-xl">₹375+</span>
               </div>
-              <div className="flex justify-between items-center pt-4 bg-yellow-50 p-4 rounded-lg">
+              <div className="flex justify-between items-center pt-4 bg-yellow-900/20 p-4 rounded-lg border border-yellow-800/30">
                 <span className="font-semibold">E-Clinic PLUS Cost</span>
                 <span className="font-semibold text-xl">₹999</span>
               </div>
-              <div className="flex justify-between items-center bg-green-50 p-4 rounded-lg">
+              <div className="flex justify-between items-center bg-green-900/20 p-4 rounded-lg border border-green-800/30">
                 <span className="font-semibold text-lg">Annual Savings</span>
                 <span className="text-green-600 font-semibold text-2xl">₹3,500+</span>
               </div>
             </div>
 
-            <p className="text-center text-muted-foreground mt-6">
+            <p className="text-center text-foreground/60 mt-6">
               *Based on average customer usage. Your savings may vary.
             </p>
           </Card>

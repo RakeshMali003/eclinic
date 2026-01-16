@@ -8,10 +8,12 @@ import {
   Brain,
   Crown,
   Tag,
-  Menu
+  Menu,
+  X
 } from "lucide-react";
 import { PageView } from "../App";
 import { useState } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface NavigationProps {
   onNavigate: (view: PageView) => void;
@@ -41,15 +43,15 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
   ];
 
   return (
-    <nav className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50">
+    <nav className="border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Nav */}
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => onNavigate("home")}> 
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-fuchsia-500 rounded-lg flex items-center justify-center shadow-sm">
-              <Heart className="w-6 h-6 text-white" />
+          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => onNavigate("home")}> 
+            <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-fuchsia-500 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+              <Heart className="w-6 h-6 text-white animate-pulse" />
             </div>
-            <span className="text-xl text-foreground">E-Clinic</span>
+            <span className="text-xl text-foreground font-semibold group-hover:text-primary transition-colors duration-300">E-Clinic</span>
           </div>
           
           {/* Desktop Main Menu */}
@@ -58,27 +60,36 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
               <button
                 key={item.view}
                 onClick={() => onNavigate(item.view)}
-                className="text-sm text-foreground/80 hover:text-primary transition-colors"
+                className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
               >
-                {item.label}
+                <span className="relative z-10 text-foreground/90 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
+                  {item.label}
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
               </button>
             ))}
             <button
               onClick={() => onNavigate("contact")}
-              className="text-sm text-foreground/80 hover:text-primary transition-colors"
+              className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
             >
-              Contact
+              <span className="relative z-10 text-foreground/90 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
+                Contact
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
             </button>
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <ThemeToggle />
             <Button 
               variant="ghost" 
               size="icon"
-              className="hidden md:flex"
+              className="hidden sm:flex"
             >
-              <ShoppingCart className="w-5 h-5" />
+              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1 rounded-full">
                   {cartCount}
@@ -88,83 +99,121 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
             <Button 
               variant="ghost" 
               onClick={() => onNavigate("login")}
-              className="hidden md:flex"
+              className="hidden sm:flex"
             >
               Login
             </Button>
             {onGetStarted && (
-              <Button onClick={onGetStarted} className="hidden md:flex">
+              <Button onClick={onGetStarted} className="hidden sm:flex">
                 Get Started
               </Button>
             )}
             <Button 
               variant="ghost" 
               size="icon"
-              className="lg:hidden"
+              className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              <Menu className="w-5 h-5" />
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
-          </div>
-        </div>
-
-        {/* Category Navigation */}
-        <div className="border-t border-border hidden md:block bg-secondary/40">
-          <div className="flex items-center gap-6 py-2 overflow-x-auto">
-            {categoryItems.map((item) => (
-              <button
-                key={item.view}
-                onClick={() => onNavigate(item.view)}
-                className="flex items-center gap-2 whitespace-nowrap text-foreground/70 hover:text-primary transition-colors"
-              >
-                <item.icon className="w-4 h-4" />
-                <span className="text-sm">{item.label}</span>
-              </button>
-            ))}
           </div>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t py-4 space-y-2">
-            {mainMenuItems.map((item) => (
-              <button
-                key={item.view}
-                onClick={() => {
-                  onNavigate(item.view);
-                  setMobileMenuOpen(false);
-                }}
-                className="block w-full text-left px-4 py-2 hover:bg-accent rounded"
-              >
-                {item.label}
-              </button>
-            ))}
-            <button
-              onClick={() => {
-                onNavigate("contact");
-                setMobileMenuOpen(false);
-              }}
-              className="block w-full text-left px-4 py-2 hover:bg-accent rounded"
-            >
-              Contact
-            </button>
-            <div className="border-t pt-2 mt-2">
-              {categoryItems.map((item) => (
+          <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b border-border shadow-lg z-50">
+            <div className="px-4 py-6 space-y-4">
+              {/* Main Menu Items */}
+              <div className="space-y-3">
+                {mainMenuItems.map((item) => (
+                  <button
+                    key={item.view}
+                    onClick={() => {
+                      onNavigate(item.view);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-foreground/90 hover:text-primary hover:bg-accent rounded-lg transition-colors font-medium"
+                  >
+                    {item.label}
+                  </button>
+                ))}
                 <button
-                  key={item.view}
                   onClick={() => {
-                    onNavigate(item.view);
+                    onNavigate("contact");
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-2 w-full px-4 py-2 hover:bg-accent rounded"
+                  className="w-full text-left px-4 py-3 text-foreground/90 hover:text-primary hover:bg-accent rounded-lg transition-colors font-medium"
                 >
-                  <item.icon className="w-4 h-4" />
-                  <span className="text-sm">{item.label}</span>
+                  Contact
                 </button>
-              ))}
+              </div>
+              
+              {/* Divider */}
+              <div className="border-t border-border pt-4">
+                <div className="space-y-3">
+                  <button
+                    onClick={() => {
+                      onNavigate("login");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-foreground/90 hover:text-primary hover:bg-accent rounded-lg transition-colors font-medium"
+                  >
+                    Login
+                  </button>
+                  {onGetStarted && (
+                    <button
+                      onClick={() => {
+                        onGetStarted();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-colors font-medium"
+                    >
+                      Get Started
+                    </button>
+                  )}
+                </div>
+              </div>
+              
+              {/* Category Items */}
+              <div className="border-t border-border pt-4">
+                <div className="grid grid-cols-2 gap-2">
+                  {categoryItems.map((item) => (
+                    <button
+                      key={item.view}
+                      onClick={() => {
+                        onNavigate(item.view);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-foreground/80 hover:text-primary hover:bg-accent rounded-lg transition-colors"
+                    >
+                      <item.icon className="w-4 h-4" />
+                      <span className="text-xs font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )}
+
+        {/* Category Navigation */}
+        <div className="border-t border-border hidden md:block bg-gradient-to-r from-secondary/50 to-secondary/30 backdrop-blur-sm">
+          <div className="flex items-center gap-4 sm:gap-6 py-2 sm:py-3 overflow-x-auto">
+            {categoryItems.map((item) => (
+              <button
+                key={item.view}
+                onClick={() => onNavigate(item.view)}
+                className="relative group flex items-center gap-2 whitespace-nowrap px-3 sm:px-4 py-2 rounded-xl transition-all duration-300 ease-out hover:scale-105"
+              >
+                <div className="relative z-10 flex items-center gap-2">
+                  <div className="w-4 h-4 text-foreground/70 group-hover:text-pink-600 transition-colors duration-300 group-hover:scale-110"></div>
+                  <span className="text-xs sm:text-sm font-medium text-foreground/80 group-hover:text-foreground transition-colors duration-300">{item.label}</span>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-600/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </nav>
   );

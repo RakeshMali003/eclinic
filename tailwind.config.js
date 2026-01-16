@@ -21,30 +21,30 @@ module.exports = {
     },
     extend: {
       colors: {
-        background: 'hsl(222.2 84% 4.9%)',
-        foreground: 'hsl(210 40% 98%)',
+        background: 'hsl(0 0% 100%)',
+        foreground: 'hsl(222.2 84% 4.9%)',
         primary: {
           DEFAULT: 'hsl(217.2 91.2% 59.8%)',
           foreground: 'hsl(222.2 47.4% 11.2%)',
         },
         secondary: {
-          DEFAULT: 'hsl(217.2 32.6% 17.5%)',
-          foreground: 'hsl(210 40% 98%)',
+          DEFAULT: 'hsl(210 40% 96%)',
+          foreground: 'hsl(222.2 84% 4.9%)',
         },
         accent: {
           DEFAULT: 'hsl(263.4 70% 50.4%)',
           foreground: 'hsl(210 40% 98%)',
         },
         muted: {
-          DEFAULT: 'hsl(217.2 32.6% 17.5%)',
-          foreground: 'hsl(215 20.2% 65.1%)',
+          DEFAULT: 'hsl(210 40% 96%)',
+          foreground: 'hsl(215.4 16.3% 46.9%)',
         },
         card: {
-          DEFAULT: 'hsl(224 71.4% 4.1%)',
-          foreground: 'hsl(210 40% 98%)',
+          DEFAULT: 'hsl(0 0% 100%)',
+          foreground: 'hsl(222.2 84% 4.9%)',
         },
-        border: 'hsl(217.2 32.6% 17.5%)',
-        input: 'hsl(217.2 32.6% 17.5%)',
+        border: 'hsl(214.3 31.8% 91.4%)',
+        input: 'hsl(214.3 31.8% 91.4%)',
         ring: 'hsl(224.3 76.3% 48%)',
         light: {
           bg: '#FFFFFF',
@@ -67,6 +67,35 @@ module.exports = {
             muted: '#94A3B8',
           },
           border: 'rgba(255,255,255,0.12)',
+        },
+        darkMode: {
+          colors: {
+            background: 'hsl(222.2 84% 4.9%)',
+            foreground: 'hsl(210 40% 98%)',
+            primary: {
+              DEFAULT: 'hsl(217.2 91.2% 59.8%)',
+              foreground: 'hsl(222.2 47.4% 11.2%)',
+            },
+            secondary: {
+              DEFAULT: 'hsl(217.2 32.6% 17.5%)',
+              foreground: 'hsl(210 40% 98%)',
+            },
+            accent: {
+              DEFAULT: 'hsl(263.4 70% 50.4%)',
+              foreground: 'hsl(210 40% 98%)',
+            },
+            muted: {
+              DEFAULT: 'hsl(217.2 32.6% 17.5%)',
+              foreground: 'hsl(215 20.2% 65.1%)',
+            },
+            card: {
+              DEFAULT: 'hsl(224 71.4% 4.1%)',
+              foreground: 'hsl(210 40% 98%)',
+            },
+            border: 'hsl(217.2 32.6% 17.5%)',
+            input: 'hsl(217.2 32.6% 17.5%)',
+            ring: 'hsl(224.3 76.3% 48%)',
+          },
         },
         brand: {
           purple: {
@@ -100,8 +129,8 @@ module.exports = {
           to: { height: 0 },
         },
         'fade-in': {
-          '0%': { opacity: 0 },
-          '100%': { opacity: 1 },
+          '0%': { opacity: 0, transform: 'translateY(20px)' },
+          '100%': { opacity: 1, transform: 'translateY(0)' },
         },
         'slide-up': {
           '0%': { transform: 'translateY(20px)', opacity: 0 },
@@ -123,6 +152,22 @@ module.exports = {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-4px)' },
         },
+        'pulse-glow': {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(236, 72, 153, 0.5)' },
+          '50%': { boxShadow: '0 0 40px rgba(236, 72, 153, 0.8)' },
+        },
+        'gradient-shift': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        'scale-in': {
+          '0%': { transform: 'scale(0.9)', opacity: 0 },
+          '100%': { transform: 'scale(1)', opacity: 1 },
+        },
+        'rotate-slow': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -133,6 +178,10 @@ module.exports = {
         'glow': 'glow 2s ease-in-out infinite alternate',
         'shimmer': 'shimmer 2s linear infinite',
         'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite alternate',
+        'gradient-shift': 'gradient-shift 3s ease-in-out infinite',
+        'scale-in': 'scale-in 0.3s ease-out',
+        'rotate-slow': 'rotate-slow 20s linear infinite',
       },
     },
   },

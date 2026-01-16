@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CartProvider } from "./contexts/CartContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { Toaster } from "./components/ui/sonner";
 import { Home } from "./components/Home";
 import { Login } from "./components/Login";
@@ -162,11 +163,13 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <CartProvider>
-        {renderView()}
-        <Toaster />
-      </CartProvider>
-    </div>
+    <ThemeProvider>
+      <div className="min-h-screen bg-background">
+        <CartProvider>
+          {renderView()}
+          <Toaster />
+        </CartProvider>
+      </div>
+    </ThemeProvider>
   );
 }
