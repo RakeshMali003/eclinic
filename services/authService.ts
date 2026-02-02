@@ -138,8 +138,23 @@ class AuthService {
         if (error) throw error;
     }
 
+    // Helper to upload document
+    async uploadDocument(bucket: string, path: string, file: File): Promise<string> {
+        const { data, error } = await supabase.storage
+            .from(bucket)
+            .upload(path, file, { upsert: true });
+
+        if (error) throw error;
+
+        const { data: { publicUrl } } = supabase.storage
+            .from(bucket)
+            .getPublicUrl(data.path);
+
+        return publicUrl;
+    }
+
     // Sign up a clinic
-    async signUpClinic(data: ClinicRegistrationData, password: string): Promise<void> {
+    async signUpClinic(data: ClinicRegistrationData, password: string, documents?: Record<string, File>): Promise<void> {
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email: data.email,
             password,
@@ -155,36 +170,35 @@ class AuthService {
         if (!authData.user) throw new Error('Failed to create auth user');
 
         // Insert into public.users
-        const { error: userError } = await supabase.from('users').insert({
+        const { error: userError } = await supabase.from('users').upsert({
             id: authData.user.id,
             email: data.email,
             full_name: data.name,
             role: 'clinic',
-            phone: data.mobile
+            mobile_number: data.mobile,
+            is_active: true
         });
 
         if (userError) throw userError;
 
         // Insert into public.clinics
         const { data: clinic, error: clinicError } = await supabase.from('clinics').insert({
+            auth_user_id: authData.user.id,
             clinic_name: data.name,
+            establishment_year: data.establishedYear,
+            tagline: data.tagline,
+            description: data.description,
             address: data.address,
             pin_code: data.pinCode,
             city: data.city,
             state: data.state,
-            mobile: data.mobile,
-            email: data.email,
-            medical_council_reg_no: data.medicalCouncilRegNo,
-            establishment_year: data.establishedYear,
-            tagline: data.tagline,
-            description: data.description,
             website: data.website,
+            medical_council_reg_no: data.medicalCouncilRegNo,
             bank_account_name: data.bankDetails?.accountName,
             bank_account_number: data.bankDetails?.accountNumber,
             ifsc_code: data.bankDetails?.ifsc,
             pan_number: data.bankDetails?.pan,
             gstin: data.bankDetails?.gstin,
-            verification_status: 'PENDING'
         }).select('id').single();
 
         if (clinicError) throw clinicError;
@@ -205,10 +219,29 @@ class AuthService {
                 data.paymentModes.map(m => ({ clinic_id: clinic.id, payment_mode: m }))
             );
         }
+
+        // Upload and insert documents
+        if (documents) {
+            for (const [key, file] of Object.entries(documents)) {
+                try {
+                    const path = `${authData.user.id}/${key}_${Date.now()}_${file.name}`;
+                    const url = await this.uploadDocument('documents', path, file);
+
+                    await supabase.from('clinic_documents').insert({
+                        clinic_id: clinic.id,
+                        document_type: key,
+                        file_url: url
+                    });
+                } catch (docError) {
+                    console.error(`Failed to upload document ${key}:`, docError);
+                    // Decide whether to fail completely or continue. Continuing allows user to re-upload later.
+                }
+            }
+        }
     }
 
     // Sign up a doctor
-    async signUpDoctor(data: DoctorRegistrationData, password: string): Promise<void> {
+    async signUpDoctor(data: DoctorRegistrationData, password: string, documents?: Record<string, File>): Promise<void> {
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email: data.email,
             password,
@@ -224,21 +257,21 @@ class AuthService {
         if (!authData.user) throw new Error('Failed to create auth user');
 
         // Insert into public.users
-        const { error: userError } = await supabase.from('users').insert({
+        const { error: userError } = await supabase.from('users').upsert({
             id: authData.user.id,
             email: data.email,
             full_name: data.name,
             role: 'doctor',
-            phone: data.mobile
+            mobile_number: data.mobile,
+            is_active: true
         });
 
         if (userError) throw userError;
 
         // Insert into public.doctors
         const { data: doctor, error: doctorError } = await supabase.from('doctors').insert({
+            auth_user_id: authData.user.id,
             full_name: data.name,
-            email: data.email,
-            mobile: data.mobile,
             date_of_birth: data.dob,
             medical_council_reg_no: data.mciReg,
             medical_council_name: data.councilName,
@@ -253,7 +286,6 @@ class AuthService {
             ifsc_code: data.bankDetails?.ifsc,
             pan_number: data.bankDetails?.pan,
             gstin: data.bankDetails?.gstin,
-            verification_status: 'PENDING'
         }).select('id').single();
 
         if (doctorError) throw doctorError;
@@ -273,6 +305,40 @@ class AuthService {
             await supabase.from('doctor_consultation_modes').insert(
                 data.consultationModes.map(m => ({ doctor_id: doctor.id, mode: m }))
             );
+        }
+        // Doctor practice locations if applicable
+        if (data.clinicName || data.clinicAddress) {
+            await supabase.from('doctor_practice_locations').insert({
+                doctor_id: doctor.id,
+                clinic_name: data.clinicName,
+                address: data.clinicAddress,
+                // Add city/state if available in formData
+            });
+        }
+
+        // Doctor services
+        if (data.servicesOffered?.length) {
+            await supabase.from('doctor_services').insert(
+                data.servicesOffered.map(s => ({ doctor_id: doctor.id, service_name: s }))
+            );
+        }
+
+        // Upload and insert documents
+        if (documents) {
+            for (const [key, file] of Object.entries(documents)) {
+                try {
+                    const path = `${authData.user.id}/${key}_${Date.now()}_${file.name}`;
+                    const url = await this.uploadDocument('documents', path, file);
+
+                    await supabase.from('doctor_documents').insert({
+                        doctor_id: doctor.id,
+                        document_type: key,
+                        file_url: url
+                    });
+                } catch (docError) {
+                    console.error(`Failed to upload document ${key}:`, docError);
+                }
+            }
         }
     }
 

@@ -101,6 +101,88 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
     password: ''
   });
 
+  const [files, setFiles] = useState<Record<string, File>>({});
+  const [customService, setCustomService] = useState('');
+  const [showCustomServiceInput, setShowCustomServiceInput] = useState(false);
+  const [customFacility, setCustomFacility] = useState('');
+  const [showCustomFacilityInput, setShowCustomFacilityInput] = useState(false);
+
+  const handleFileChange = (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFiles(prev => ({ ...prev, [key]: e.target.files![0] }));
+      toast.success(`${key} selected: ${e.target.files![0].name}`);
+    }
+  };
+
+  const handleAddCustomService = () => {
+    if (customService.trim()) {
+      setSelectedServices(prev => [...prev, customService.trim()]);
+      setCustomService('');
+      setShowCustomServiceInput(false);
+      toast.success("Custom service added!");
+    }
+  };
+
+  const handleAddCustomFacility = () => {
+    if (customFacility.trim()) {
+      setSelectedFacilities(prev => [...prev, customFacility.trim()]);
+      setCustomFacility('');
+      setShowCustomFacilityInput(false);
+      toast.success("Custom facility added!");
+    }
+  };
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateStep = (step: number) => {
+    const newErrors: Record<string, string> = {};
+    let isValid = true;
+
+    if (step === 1) {
+      if (!formData.clinicName) newErrors.clinicName = "Clinic Name is required";
+      if (!formData.clinicType) newErrors.clinicType = "Clinic Type is required";
+      if (!formData.establishedYear) newErrors.establishedYear = "Established Year is required";
+      if (!formData.description) newErrors.description = "Description is required";
+      if (!formData.password) newErrors.password = "Password is required";
+    }
+
+    if (step === 2) {
+      if (!formData.address) newErrors.address = "Address is required";
+      if (!formData.pinCode) newErrors.pinCode = "PIN Code is required";
+      else if (formData.pinCode.length !== 6) newErrors.pinCode = "PIN Code must be 6 digits";
+      if (!formData.city) newErrors.city = "City is required";
+      if (!formData.state) newErrors.state = "State is required";
+      if (!formData.mobile) newErrors.mobile = "Contact Number is required";
+      else if (formData.mobile.length !== 10) newErrors.mobile = "Mobile Number must be 10 digits";
+      if (!formData.email) newErrors.email = "Email is required";
+      else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email format";
+      if (!formData.medicalCouncilRegNo) newErrors.medicalCouncilRegNo = "Medical Council Reg No is required";
+    }
+
+    if (step === 6) {
+      if (!formData.accountName) newErrors.accountName = "Account Holder Name is required";
+      if (!formData.accountNumber) newErrors.accountNumber = "Account Number is required";
+      if (!formData.ifsc) newErrors.ifsc = "IFSC Code is required";
+      if (!formData.pan) newErrors.pan = "PAN Number is required";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      isValid = false;
+      toast.error("Please fill in all required fields correctly.");
+    } else {
+      setErrors({});
+    }
+
+    return isValid;
+  };
+
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
@@ -138,7 +220,7 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
         facilities: selectedFacilities,
         paymentModes: selectedPaymentModes,
         bookingModes: selectedBookingModes
-      }, formData.password);
+      }, formData.password, files);
 
       toast.success('Registration successful! Please check your email for verification.');
       onBack();
@@ -180,22 +262,23 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="clinicName">Clinic / Hospital Name</Label>
+        <Label htmlFor="clinicName">Clinic / Hospital Name *</Label>
         <p className="text-xs text-gray-600 mt-1">As per registration certificate</p>
         <Input
           id="clinicName"
           placeholder="Clinic or Hospital name"
-          className="mt-2"
+          className={`mt-2 ${errors.clinicName ? 'border-red-500' : ''}`}
           value={formData.clinicName}
           onChange={handleInputChange}
         />
+        {errors.clinicName && <p className="text-xs text-red-500 mt-1">{errors.clinicName}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="clinicType">Type</Label>
+          <Label htmlFor="clinicType">Type *</Label>
           <Select onValueChange={(v) => handleSelectChange('clinicType', v)}>
-            <SelectTrigger id="clinicType" className="mt-2">
+            <SelectTrigger id="clinicType" className={`mt-2 ${errors.clinicType ? 'border-red-500' : ''}`}>
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
@@ -205,18 +288,20 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
               <SelectItem value="diagnostic_center">Diagnostic Center</SelectItem>
             </SelectContent>
           </Select>
+          {errors.clinicType && <p className="text-xs text-red-500 mt-1">{errors.clinicType}</p>}
         </div>
 
         <div>
-          <Label htmlFor="establishedYear">Established Year</Label>
+          <Label htmlFor="establishedYear">Established Year *</Label>
           <Input
             id="establishedYear"
             placeholder="e.g., 2010"
             type="number"
-            className="mt-2"
+            className={`mt-2 ${errors.establishedYear ? 'border-red-500' : ''}`}
             value={formData.establishedYear}
             onChange={handleInputChange}
           />
+          {errors.establishedYear && <p className="text-xs text-red-500 mt-1">{errors.establishedYear}</p>}
         </div>
       </div>
 
@@ -232,28 +317,30 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
       </div>
 
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">Description *</Label>
         <Textarea
           id="description"
           placeholder="Describe your clinic, specialties, vision, facilities..."
           rows={4}
-          className="mt-2"
+          className={`mt-2 ${errors.description ? 'border-red-500' : ''}`}
           value={formData.description}
           onChange={handleInputChange}
         />
         <p className="text-xs text-gray-500 mt-1">{formData.description.length}/500 characters</p>
+        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
       </div>
 
       <div>
-        <Label htmlFor="password">Login Password</Label>
+        <Label htmlFor="password">Login Password *</Label>
         <Input
           id="password"
           type="password"
           placeholder="Create a secure password"
-          className="mt-2"
+          className={`mt-2 ${errors.password ? 'border-red-500' : ''}`}
           value={formData.password}
           onChange={handleInputChange}
         />
+        {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
       </div>
     </div>
   );
@@ -261,67 +348,72 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
   const renderStep2 = () => (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="address">Complete Address</Label>
+        <Label htmlFor="address">Complete Address *</Label>
         <p className="text-xs text-gray-600 mt-1">Full address including building name/number</p>
         <Textarea
           id="address"
           placeholder="Complete address"
           rows={3}
-          className="mt-2"
+          className={`mt-2 ${errors.address ? 'border-red-500' : ''}`}
           value={formData.address}
           onChange={handleInputChange}
         />
+        {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="pinCode">PIN Code</Label>
+          <Label htmlFor="pinCode">PIN Code *</Label>
           <Input
             id="pinCode"
             placeholder="6-digit PIN"
             maxLength={6}
-            className="mt-2"
+            className={`mt-2 ${errors.pinCode ? 'border-red-500' : ''}`}
             value={formData.pinCode}
             onChange={handleInputChange}
           />
+          {errors.pinCode && <p className="text-xs text-red-500 mt-1">{errors.pinCode}</p>}
         </div>
 
         <div>
-          <Label htmlFor="city">City</Label>
+          <Label htmlFor="city">City *</Label>
           <Input
             id="city"
             placeholder="City"
-            className="mt-2"
+            className={`mt-2 ${errors.city ? 'border-red-500' : ''}`}
             value={formData.city}
             onChange={handleInputChange}
           />
+          {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
         </div>
       </div>
 
       <div>
-        <Label htmlFor="state">State</Label>
+        <Label htmlFor="state">State *</Label>
         <Input
           id="state"
           placeholder="State"
-          className="mt-2"
+          className={`mt-2 ${errors.state ? 'border-red-500' : ''}`}
           value={formData.state}
           onChange={handleInputChange}
         />
+        {errors.state && <p className="text-xs text-red-500 mt-1">{errors.state}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="mobile">Contact Number</Label>
+          <Label htmlFor="mobile">Contact Number *</Label>
           <div className="flex gap-2 mt-2">
             <Input
               id="mobile"
               placeholder="10-digit mobile"
-              className="flex-1"
+              maxLength={10}
+              className={`flex-1 ${errors.mobile ? 'border-red-500' : ''}`}
               value={formData.mobile}
               onChange={handleInputChange}
             />
             {!mobileVerified ? (
-              <Button onClick={() => setMobileVerified(true)} className="bg-pink-600 px-3 h-10">
+              <Button onClick={() => { if (formData.mobile.length === 10) setMobileVerified(true); else toast.error("Invalid mobile"); }} className="bg-pink-600 px-3 h-10">
                 Verify
               </Button>
             ) : (
@@ -330,20 +422,21 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
               </Button>
             )}
           </div>
+          {errors.mobile && <p className="text-xs text-red-500 mt-1">{errors.mobile}</p>}
         </div>
 
         <div>
-          <Label htmlFor="email">Email Address</Label>
+          <Label htmlFor="email">Email Address *</Label>
           <div className="flex gap-2 mt-2">
             <Input
               id="email"
               placeholder="Official email"
-              className="flex-1"
+              className={`flex-1 ${errors.email ? 'border-red-500' : ''}`}
               value={formData.email}
               onChange={handleInputChange}
             />
             {!emailVerified ? (
-              <Button onClick={() => setEmailVerified(true)} className="bg-pink-600 px-3 h-10">
+              <Button onClick={() => { if (/\S+@\S+\.\S+/.test(formData.email)) setEmailVerified(true); else toast.error("Invalid email"); }} className="bg-pink-600 px-3 h-10">
                 Verify
               </Button>
             ) : (
@@ -352,6 +445,7 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
               </Button>
             )}
           </div>
+          {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
         </div>
       </div>
 
@@ -367,14 +461,15 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
       </div>
 
       <div>
-        <Label htmlFor="medicalCouncilRegNo">Medical Council Registration No.</Label>
+        <Label htmlFor="medicalCouncilRegNo">Medical Council Registration No. *</Label>
         <Input
           id="medicalCouncilRegNo"
           placeholder="Registration number"
-          className="mt-2"
+          className={`mt-2 ${errors.medicalCouncilRegNo ? 'border-red-500' : ''}`}
           value={formData.medicalCouncilRegNo}
           onChange={handleInputChange}
         />
+        {errors.medicalCouncilRegNo && <p className="text-xs text-red-500 mt-1">{errors.medicalCouncilRegNo}</p>}
       </div>
     </div>
   );
@@ -387,41 +482,38 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
         </p>
       </div>
 
-      <div>
-        <Label>Registration Certificate</Label>
-        <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-pink-400 transition-colors">
-          <Upload className="size-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-sm text-gray-600 mb-2">Click to upload or drag & drop</p>
-          <p className="text-xs text-gray-500">PDF, JPG, PNG (Max 5MB)</p>
+      {[
+        { key: 'registration', label: 'Registration Certificate', desc: 'Click to upload' },
+        { key: 'license', label: 'Medical License / Permission Letter', desc: 'MCI / State Medical Council Registration No.' },
+        { key: 'idProof', label: 'Premise Proof / ID Proof', desc: 'Utility Bill / Rent Agreement / Clinic Photo' },
+        { key: 'gst', label: 'GST Certificate (if applicable)', desc: 'Upload GST Certificate' }
+      ].map((doc) => (
+        <div key={doc.key}>
+          <Label>{doc.label}</Label>
+          <div className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition-colors relative ${files[doc.key] ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-pink-400'}`}>
+            <input
+              type="file"
+              id={`file-${doc.key}`}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              onChange={(e) => handleFileChange(doc.key, e)}
+              accept=".pdf,.jpg,.jpeg,.png"
+            />
+            {files[doc.key] ? (
+              <div className="flex flex-col items-center">
+                <CheckCircle className="size-10 text-green-500 mx-auto mb-2" />
+                <p className="text-sm text-green-700 font-medium">{files[doc.key].name}</p>
+                <p className="text-xs text-green-600 mt-1">{(files[doc.key].size / 1024 / 1024).toFixed(2)} MB</p>
+              </div>
+            ) : (
+              <>
+                <Upload className="size-10 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-600">{doc.desc}</p>
+                <p className="text-xs text-gray-500 mt-1">PDF, JPG, PNG (Max 5MB)</p>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-
-      <div>
-        <Label>Medical License / Permission Letter</Label>
-        <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
-          <Upload className="size-10 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">MCI / State Medical Council Registration No.</p>
-          <Input placeholder="e.g., MH/12345/2020" className="mt-3 max-w-xs mx-auto" />
-        </div>
-      </div>
-
-      <div>
-        <Label>Premise Proof / ID Proof</Label>
-        <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
-          <Upload className="size-10 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Upload ID Proof</p>
-          <p className="text-xs text-gray-500 mt-1">Utility Bill / Rent Agreement / Clinic Photo</p>
-        </div>
-      </div>
-
-      <div>
-        <Label>GST Certificate (if applicable)</Label>
-        <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
-          <Upload className="size-10 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Upload GST Certificate (if applicable)</p>
-          <p className="text-xs text-gray-500 mt-1">PDF, JPG, PNG (Max 5MB)</p>
-        </div>
-      </div>
+      ))}
     </div>
   );
 
@@ -595,6 +687,38 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
               <p className="text-sm font-medium">{service}</p>
             </div>
           ))}
+          {/* Custom Services Display */}
+          {selectedServices.filter(s => !servicesProvided.includes(s)).map((service) => (
+            <div
+              key={service}
+              onClick={() => toggleSelection(service, selectedServices, setSelectedServices)}
+              className="p-3 border rounded-lg cursor-pointer transition-colors bg-purple-600 text-white border-purple-600"
+            >
+              <p className="text-sm font-medium">{service}</p>
+            </div>
+          ))}
+
+          {/* Add Other Button */}
+          {!showCustomServiceInput ? (
+            <div
+              onClick={() => setShowCustomServiceInput(true)}
+              className="p-3 border border-dashed border-gray-400 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors flex items-center justify-center"
+            >
+              <p className="text-sm font-medium text-gray-600">+ Other</p>
+            </div>
+          ) : (
+            <div className="p-3 border border-purple-200 rounded-lg bg-white flex items-center gap-2">
+              <Input
+                value={customService}
+                onChange={(e) => setCustomService(e.target.value)}
+                placeholder="Type service..."
+                className="h-8 text-sm"
+              />
+              <Button size="sm" onClick={handleAddCustomService} className="h-8 w-8 p-0 bg-purple-600">
+                <CheckCircle className="size-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -613,6 +737,38 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
               <p className="text-sm font-medium">{facility}</p>
             </div>
           ))}
+          {/* Custom Facilities Display */}
+          {selectedFacilities.filter(f => !facilities.includes(f)).map((facility) => (
+            <div
+              key={facility}
+              onClick={() => toggleSelection(facility, selectedFacilities, setSelectedFacilities)}
+              className="p-3 border rounded-lg cursor-pointer transition-colors bg-pink-600 text-white border-pink-600"
+            >
+              <p className="text-sm font-medium">{facility}</p>
+            </div>
+          ))}
+
+          {/* Add Other Button */}
+          {!showCustomFacilityInput ? (
+            <div
+              onClick={() => setShowCustomFacilityInput(true)}
+              className="p-3 border border-dashed border-gray-400 rounded-lg cursor-pointer hover:border-pink-400 hover:bg-pink-50 transition-colors flex items-center justify-center"
+            >
+              <p className="text-sm font-medium text-gray-600">+ Other</p>
+            </div>
+          ) : (
+            <div className="p-3 border border-pink-200 rounded-lg bg-white flex items-center gap-2">
+              <Input
+                value={customFacility}
+                onChange={(e) => setCustomFacility(e.target.value)}
+                placeholder="Type facility..."
+                className="h-8 text-sm"
+              />
+              <Button size="sm" onClick={handleAddCustomFacility} className="h-8 w-8 p-0 bg-pink-600">
+                <CheckCircle className="size-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -820,7 +976,7 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
               )}
               {currentStep < 6 ? (
                 <Button
-                  onClick={() => setCurrentStep(currentStep + 1)}
+                  onClick={handleNext}
                   className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
                 >
                   Next
@@ -828,7 +984,7 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
                 </Button>
               ) : (
                 <Button
-                  onClick={handleSubmit}
+                  onClick={() => { if (validateStep(6)) handleSubmit(); }}
                   disabled={loading}
                   className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
                 >

@@ -1,6 +1,6 @@
 import { Button } from "./ui/button";
-import { 
-  Heart, 
+import {
+  Heart,
   ShoppingCart,
   Pill,
   FlaskConical,
@@ -44,16 +44,16 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
 
   return (
     <nav className="border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* Top Nav */}
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => onNavigate("home")}> 
+          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => onNavigate("home")}>
             <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-fuchsia-500 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
               <Heart className="w-6 h-6 text-white animate-pulse" />
             </div>
             <span className="text-xl text-foreground font-semibold group-hover:text-primary transition-colors duration-300">E-Clinic</span>
           </div>
-          
+
           {/* Desktop Main Menu */}
           <div className="hidden lg:flex items-center gap-6">
             {mainMenuItems.map((item) => (
@@ -84,8 +84,8 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
           {/* Right Side Actions */}
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle />
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className="hidden sm:flex"
             >
@@ -96,8 +96,8 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
                 </span>
               )}
             </Button>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               onClick={() => onNavigate("login")}
               className="hidden sm:flex"
             >
@@ -108,8 +108,8 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
                 Get Started
               </Button>
             )}
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -147,7 +147,7 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
                   Contact
                 </button>
               </div>
-              
+
               {/* Divider */}
               <div className="border-t border-border pt-4">
                 <div className="space-y-3">
@@ -173,7 +173,7 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
                   )}
                 </div>
               </div>
-              
+
               {/* Category Items */}
               <div className="border-t border-border pt-4">
                 <div className="grid grid-cols-2 gap-2">

@@ -100,6 +100,79 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
     password: ''
   });
 
+  const [files, setFiles] = useState<Record<string, File>>({});
+  const [customService, setCustomService] = useState('');
+  const [showCustomServiceInput, setShowCustomServiceInput] = useState(false);
+
+  const handleFileChange = (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFiles(prev => ({ ...prev, [key]: e.target.files![0] }));
+      toast.success(`${key} selected: ${e.target.files![0].name}`);
+    }
+  };
+
+  const handleAddCustomService = () => {
+    if (customService.trim()) {
+      setSelectedServices(prev => [...prev, customService.trim()]);
+      setCustomService('');
+      setShowCustomServiceInput(false);
+      toast.success("Custom service added!");
+    }
+  };
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateStep = (step: number) => {
+    const newErrors: Record<string, string> = {};
+    let isValid = true;
+
+    if (step === 1) {
+      if (!formData.fullName) newErrors.fullName = "Full Name is required";
+      if (!formData.gender) newErrors.gender = "Gender is required";
+      if (!formData.dob) newErrors.dob = "Date of Birth is required";
+      if (!formData.mobile) newErrors.mobile = "Mobile Number is required";
+      else if (formData.mobile.length !== 10) newErrors.mobile = "Mobile Number must be 10 digits";
+      if (!formData.email) newErrors.email = "Email is required";
+      else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email format";
+      if (!formData.password) newErrors.password = "Password is required";
+    }
+
+    if (step === 2) {
+      if (!formData.mciReg) newErrors.mciReg = "MCI Registration Number is required";
+      if (!formData.council) newErrors.council = "Medical Council Name is required";
+      if (!formData.regYear) newErrors.regYear = "Registration Year is required";
+      if (!formData.degrees) newErrors.degrees = "Degrees are required";
+      if (!formData.university) newErrors.university = "University Name is required";
+      if (!formData.gradYear) newErrors.gradYear = "Graduation Year is required";
+      if (!formData.experience) newErrors.experience = "Experience is required";
+      if (selectedSpecializations.length === 0) newErrors.specializations = "Select at least one specialization";
+      if (selectedLanguages.length === 0) newErrors.languages = "Select at least one language";
+    }
+
+    if (step === 5) {
+      if (!formData.accountName) newErrors.accountName = "Account Holder Name is required";
+      if (!formData.accountNumber) newErrors.accountNumber = "Account Number is required";
+      if (!formData.ifsc) newErrors.ifsc = "IFSC Code is required";
+      if (!formData.pan) newErrors.pan = "PAN Number is required";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      isValid = false;
+      toast.error("Please fill in all required fields correctly.");
+    } else {
+      setErrors({});
+    }
+
+    return isValid;
+  };
+
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
@@ -112,14 +185,14 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      await authService.signUpDoctor({
+      const registrationData: any = {
         name: formData.fullName,
+        email: formData.email,
+        mobile: formData.mobile,
         gender: formData.gender,
         dob: formData.dob,
-        mobile: formData.mobile,
-        email: formData.email,
         mciReg: formData.mciReg,
-        council: formData.council,
+        councilName: formData.council,
         regYear: parseInt(formData.regYear),
         degrees: formData.degrees,
         university: formData.university,
@@ -127,16 +200,13 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
         experience: parseInt(formData.experience),
         specializations: selectedSpecializations,
         languages: selectedLanguages,
-        practiceInfo: {
-          clinicName: formData.clinicName,
-          address: formData.clinicAddress,
-          workingDays: workingDays,
-          consultationFees: {
-            inClinic: parseFloat(formData.inClinicFee),
-            online: parseFloat(formData.onlineFee)
-          },
-          modes: selectedModes
-        },
+        clinicName: formData.clinicName,
+        clinicAddress: formData.clinicAddress,
+        inClinicFee: parseFloat(formData.inClinicFee),
+        onlineFee: parseFloat(formData.onlineFee),
+        consultationModes: selectedModes,
+        conditionsTreated: selectedConditions,
+        servicesOffered: selectedServices,
         bankDetails: {
           accountName: formData.accountName,
           accountNumber: formData.accountNumber,
@@ -145,13 +215,18 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
           gstin: formData.gstin
         },
         bio: formData.bio
-      }, formData.password);
+      };
 
-      toast.success('Registration successful! Please check your email for verification.');
-      onBack();
+      await authService.signUpDoctor(registrationData, formData.password, files);
+
+      toast.success("Registration successful! Please login to continue.");
+      // Redirect to login or verification pending page
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
     } catch (error: any) {
-      console.error('Registration error:', error);
-      toast.error(error.message || 'Failed to register doctor');
+      console.error("Registration failed:", error);
+      toast.error(error.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -168,21 +243,22 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="fullName">Dr. Full Name</Label>
+        <Label htmlFor="fullName">Dr. Full Name *</Label>
         <Input
           id="fullName"
           placeholder="Dr. First Middle Last"
-          className="mt-2"
+          className={`mt-2 ${errors.fullName ? 'border-red-500' : ''}`}
           value={formData.fullName}
           onChange={handleInputChange}
         />
+        {errors.fullName && <p className="text-xs text-red-500 mt-1">{errors.fullName}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="gender">Gender</Label>
+          <Label htmlFor="gender">Gender *</Label>
           <Select onValueChange={(v) => handleSelectChange('gender', v)}>
-            <SelectTrigger id="gender" className="mt-2">
+            <SelectTrigger id="gender" className={`mt-2 ${errors.gender ? 'border-red-500' : ''}`}>
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
@@ -191,44 +267,48 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
               <SelectItem value="other">Other</SelectItem>
             </SelectContent>
           </Select>
+          {errors.gender && <p className="text-xs text-red-500 mt-1">{errors.gender}</p>}
         </div>
 
         <div>
-          <Label htmlFor="dob">Date of Birth</Label>
+          <Label htmlFor="dob">Date of Birth *</Label>
           <Input
             id="dob"
             type="date"
-            className="mt-2"
+            className={`mt-2 ${errors.dob ? 'border-red-500' : ''}`}
             value={formData.dob}
             onChange={handleInputChange}
           />
+          {errors.dob && <p className="text-xs text-red-500 mt-1">{errors.dob}</p>}
         </div>
       </div>
 
       <div>
-        <Label htmlFor="password">Login Password</Label>
+        <Label htmlFor="password">Login Password *</Label>
         <Input
           id="password"
           type="password"
           placeholder="Create a secure password"
-          className="mt-2"
+          className={`mt-2 ${errors.password ? 'border-red-500' : ''}`}
           value={formData.password}
           onChange={handleInputChange}
         />
+        {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
       </div>
 
       <div>
-        <Label htmlFor="mobile">Mobile Number</Label>
+        <Label htmlFor="mobile">Mobile Number *</Label>
         <div className="flex gap-2 mt-2">
           <Input
             id="mobile"
             placeholder="10-digit mobile"
-            className="flex-1"
+            maxLength={10}
+            className={`flex-1 ${errors.mobile ? 'border-red-500' : ''}`}
             value={formData.mobile}
             onChange={handleInputChange}
           />
           {!mobileVerified ? (
-            <Button onClick={() => setMobileVerified(true)} className="bg-pink-600 px-3 h-10">
+            <Button onClick={() => { if (formData.mobile.length === 10) setMobileVerified(true); else toast.error("Invalid mobile"); }} className="bg-pink-600 px-3 h-10">
               Verify
             </Button>
           ) : (
@@ -237,21 +317,22 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
             </Button>
           )}
         </div>
+        {errors.mobile && <p className="text-xs text-red-500 mt-1">{errors.mobile}</p>}
       </div>
 
       <div>
-        <Label htmlFor="email">Email Address</Label>
+        <Label htmlFor="email">Email Address *</Label>
         <div className="flex gap-2 mt-2">
           <Input
             id="email"
             type="email"
             placeholder="doctor@example.com"
-            className="flex-1"
+            className={`flex-1 ${errors.email ? 'border-red-500' : ''}`}
             value={formData.email}
             onChange={handleInputChange}
           />
           {!emailVerified ? (
-            <Button onClick={() => setEmailVerified(true)} className="bg-pink-600 px-3 h-10">
+            <Button onClick={() => { if (/\S+@\S+\.\S+/.test(formData.email)) setEmailVerified(true); else toast.error("Invalid email"); }} className="bg-pink-600 px-3 h-10">
               Verify
             </Button>
           ) : (
@@ -260,6 +341,7 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
             </Button>
           )}
         </div>
+        {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
       </div>
     </div>
   );
@@ -267,80 +349,99 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
   const renderStep2 = () => (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="mciReg">MCI / State Medical Council Registration No.</Label>
+        <Label htmlFor="mciReg">MCI / State Medical Council Registration No. *</Label>
         <p className="text-xs text-pink-600 mt-1">🏷️ This is mandatory for verification</p>
         <Input
           id="mciReg"
           placeholder="e.g., MH/12345/2015"
-          className="mt-2"
+          className={`mt-2 ${errors.mciReg ? 'border-red-500' : ''}`}
           value={formData.mciReg}
           onChange={handleInputChange}
         />
+        {errors.mciReg && <p className="text-xs text-red-500 mt-1">{errors.mciReg}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="council">Medical Council Name</Label>
+          <Label htmlFor="council">Medical Council Name *</Label>
           <Input
             id="council"
             placeholder="e.g., Maharashtra Medical Council"
-            className="mt-2"
+            className={`mt-2 ${errors.council ? 'border-red-500' : ''}`}
             value={formData.council}
             onChange={handleInputChange}
           />
+          {errors.council && <p className="text-xs text-red-500 mt-1">{errors.council}</p>}
         </div>
 
         <div>
-          <Label htmlFor="regYear">Registration Year</Label>
+          <Label htmlFor="regYear">Registration Year *</Label>
           <Input
             id="regYear"
             placeholder="e.g., 2015"
             type="number"
-            className="mt-2"
+            className={`mt-2 ${errors.regYear ? 'border-red-500' : ''}`}
             value={formData.regYear}
             onChange={handleInputChange}
           />
+          {errors.regYear && <p className="text-xs text-red-500 mt-1">{errors.regYear}</p>}
         </div>
       </div>
 
       <div>
-        <Label htmlFor="degrees">Degrees</Label>
+        <Label htmlFor="degrees">Degrees *</Label>
         <Input
           id="degrees"
           placeholder="MBBS, MD, BDS, etc. (comma-separated)"
-          className="mt-2"
+          className={`mt-2 ${errors.degrees ? 'border-red-500' : ''}`}
           value={formData.degrees}
           onChange={handleInputChange}
         />
+        {errors.degrees && <p className="text-xs text-red-500 mt-1">{errors.degrees}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="university">University</Label>
+          <Label htmlFor="university">University *</Label>
           <Input
             id="university"
             placeholder="University name"
-            className="mt-2"
+            className={`mt-2 ${errors.university ? 'border-red-500' : ''}`}
             value={formData.university}
             onChange={handleInputChange}
           />
+          {errors.university && <p className="text-xs text-red-500 mt-1">{errors.university}</p>}
         </div>
 
         <div>
-          <Label htmlFor="gradYear">Graduation Year</Label>
+          <Label htmlFor="gradYear">Graduation Year *</Label>
           <Input
             id="gradYear"
             placeholder="e.g., 2010"
             type="number"
-            className="mt-2"
+            className={`mt-2 ${errors.gradYear ? 'border-red-500' : ''}`}
             value={formData.gradYear}
             onChange={handleInputChange}
           />
+          {errors.gradYear && <p className="text-xs text-red-500 mt-1">{errors.gradYear}</p>}
         </div>
       </div>
 
       <div>
-        <Label>Specializations (Select all that apply)</Label>
+        <Label htmlFor="experience">Years of Experience *</Label>
+        <Input
+          id="experience"
+          placeholder="e.g., 10"
+          type="number"
+          className={`mt-2 ${errors.experience ? 'border-red-500' : ''}`}
+          value={formData.experience}
+          onChange={handleInputChange}
+        />
+        {errors.experience && <p className="text-xs text-red-500 mt-1">{errors.experience}</p>}
+      </div>
+
+      <div>
+        <Label>Specializations * (Select all that apply)</Label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
           {specializations.map((spec) => (
             <div
@@ -355,22 +456,11 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
             </div>
           ))}
         </div>
+        {errors.specializations && <p className="text-xs text-red-500 mt-1">{errors.specializations}</p>}
       </div>
 
       <div>
-        <Label htmlFor="experience">Years of Experience</Label>
-        <Input
-          id="experience"
-          placeholder="e.g., 10"
-          type="number"
-          className="mt-2"
-          value={formData.experience}
-          onChange={handleInputChange}
-        />
-      </div>
-
-      <div>
-        <Label>Languages Spoken</Label>
+        <Label>Languages Spoken *</Label>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
           {languages.map((lang) => (
             <div
@@ -385,6 +475,7 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
             </div>
           ))}
         </div>
+        {errors.languages && <p className="text-xs text-red-500 mt-1">{errors.languages}</p>}
       </div>
     </div>
   );
@@ -397,50 +488,39 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
         </p>
       </div>
 
-      <div>
-        <Label>Upload Medical Council Registration</Label>
-        <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
-          <Upload className="size-10 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Click to upload or drag & drop</p>
-          <p className="text-xs text-gray-500 mt-1">PDF, JPG, PNG (Max 5MB)</p>
+      {[
+        { key: 'mciReg', label: 'Upload Medical Council Registration', desc: 'Click to upload or drag & drop' },
+        { key: 'degree', label: 'Upload Degree Certificate', desc: 'Click to upload' },
+        { key: 'idProof', label: 'Upload Government ID', desc: 'Aadhaar / PAN / Passport' },
+        { key: 'clinicLetter', label: 'Upload Clinic Letter (if attached to clinic)', desc: 'Optional' },
+        { key: 'signature', label: 'Upload signature image (transparent background preferred)', desc: 'Digital signature for prescriptions' }
+      ].map((doc) => (
+        <div key={doc.key}>
+          <Label>{doc.label}</Label>
+          <div className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition-colors relative ${files[doc.key] ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-pink-400'}`}>
+            <input
+              type="file"
+              id={`file-${doc.key}`}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              onChange={(e) => handleFileChange(doc.key, e)}
+              accept=".pdf,.jpg,.jpeg,.png"
+            />
+            {files[doc.key] ? (
+              <div className="flex flex-col items-center">
+                <CheckCircle className="size-10 text-green-500 mx-auto mb-2" />
+                <p className="text-sm text-green-700 font-medium">{files[doc.key].name}</p>
+                <p className="text-xs text-green-600 mt-1">{(files[doc.key].size / 1024 / 1024).toFixed(2)} MB</p>
+              </div>
+            ) : (
+              <>
+                <Upload className="size-10 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-600">{doc.desc}</p>
+                <p className="text-xs text-gray-500 mt-1">PDF, JPG, PNG (Max 5MB)</p>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-
-      <div>
-        <Label>Upload Degree Certificate</Label>
-        <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
-          <Upload className="size-10 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Click to upload</p>
-          <p className="text-xs text-gray-500 mt-1">PDF, JPG, PNG (Max 5MB)</p>
-        </div>
-      </div>
-
-      <div>
-        <Label>Upload Government ID</Label>
-        <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
-          <Upload className="size-10 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Aadhaar / PAN / Passport</p>
-          <p className="text-xs text-gray-500 mt-1">PDF, JPG, PNG (Max 5MB)</p>
-        </div>
-      </div>
-
-      <div>
-        <Label>Upload Clinic Letter (if attached to clinic)</Label>
-        <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
-          <Upload className="size-10 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Optional</p>
-          <p className="text-xs text-gray-500 mt-1">PDF, JPG, PNG (Max 5MB)</p>
-        </div>
-      </div>
-
-      <div>
-        <Label>Upload signature image (transparent background preferred)</Label>
-        <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
-          <Upload className="size-10 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Digital signature for prescriptions</p>
-          <p className="text-xs text-gray-500 mt-1">PNG (Max 1MB)</p>
-        </div>
-      </div>
+      ))}
     </div>
   );
 
@@ -564,6 +644,38 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
               <p className="text-sm font-medium">{service}</p>
             </div>
           ))}
+          {/* Custom Services Display */}
+          {selectedServices.filter(s => !servicesOffered.includes(s)).map((service) => (
+            <div
+              key={service}
+              onClick={() => toggleSelection(service, selectedServices, setSelectedServices)}
+              className="p-3 border rounded-lg cursor-pointer transition-colors bg-purple-600 text-white border-purple-600"
+            >
+              <p className="text-sm font-medium">{service}</p>
+            </div>
+          ))}
+
+          {/* Add Other Button */}
+          {!showCustomServiceInput ? (
+            <div
+              onClick={() => setShowCustomServiceInput(true)}
+              className="p-3 border border-dashed border-gray-400 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors flex items-center justify-center"
+            >
+              <p className="text-sm font-medium text-gray-600">+ Other</p>
+            </div>
+          ) : (
+            <div className="p-3 border border-purple-200 rounded-lg bg-white flex items-center gap-2">
+              <Input
+                value={customService}
+                onChange={(e) => setCustomService(e.target.value)}
+                placeholder="Type service..."
+                className="h-8 text-sm"
+              />
+              <Button size="sm" onClick={handleAddCustomService} className="h-8 w-8 p-0 bg-purple-600">
+                <CheckCircle className="size-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -767,7 +879,7 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
               )}
               {currentStep < 5 ? (
                 <Button
-                  onClick={() => setCurrentStep(currentStep + 1)}
+                  onClick={handleNext}
                   className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
                 >
                   Next
@@ -775,7 +887,7 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
                 </Button>
               ) : (
                 <Button
-                  onClick={handleSubmit}
+                  onClick={() => { if (validateStep(5)) handleSubmit(); }}
                   disabled={loading}
                   className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
                 >

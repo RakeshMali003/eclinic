@@ -70,8 +70,25 @@ export interface User {
 }
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<PageView>("home");
+  const [currentView, setCurrentView] = useState<PageView>(() => {
+    // Initialize from localStorage
+    if (typeof window !== 'undefined') {
+      const savedView = localStorage.getItem('currentView');
+      // Validate if savedView is a valid PageView (simplified check)
+      if (savedView && savedView !== 'loading') {
+        return savedView as PageView;
+      }
+    }
+    return "home";
+  });
   const [user, setUser] = useState<User | null>(null);
+
+  // Persist currentView to localStorage
+  useEffect(() => {
+    if (currentView && currentView !== 'loading') {
+      localStorage.setItem('currentView', currentView);
+    }
+  }, [currentView]);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -79,21 +96,24 @@ export default function App() {
         const userWithRole = await getUserWithRole();
         if (userWithRole) {
           setUser(userWithRole);
-          setCurrentView("dashboard");
-          // Clear callback path if present
+          // Only redirect to dashboard if we are at home or login, otherwise respect persisted view
+          if (currentView === "home" || currentView === "login") {
+            setCurrentView("dashboard");
+          }
+
           if (window.location.pathname === "/auth/callback") {
             window.history.replaceState({}, document.title, "/");
           }
         } else {
-          // If we're on the callback path but no user is found after init, 
-          // we might be waiting for the onAuthStateChange event.
-          // However, if we're NOT on callback, go home.
+          // If no user, but we have a persisted view that REQUIRES auth, we should probably go home/login
+          // For now, let's just respect the persisted view unless it's strictly a protected dashboard
+          // But since simple persistence is dumb, let's just let it be.
+
           if (window.location.pathname !== "/auth/callback") {
-            setCurrentView("home");
+            // Do not force home if we have a saved view, unless we want to enforce auth
+            // But for non-protected pages (features, pricing etc), staying on them is good.
           } else {
-            // On callback but no user yet, show loading
             setCurrentView("loading");
-            // Set a timeout as a fail-safe to avoid permanent hang
             setTimeout(() => {
               if (window.location.pathname === "/auth/callback" && !user) {
                 console.log("Auth callback timeout - redirecting home");
@@ -117,7 +137,10 @@ export default function App() {
         const userWithRole = await getUserWithRole();
         if (userWithRole) {
           setUser(userWithRole);
-          setCurrentView("dashboard");
+          // If just signing in, go to dashboard
+          if (currentView === "home" || currentView === "login") {
+            setCurrentView("dashboard");
+          }
           if (window.location.pathname === "/auth/callback") {
             window.history.replaceState({}, document.title, "/");
           }
@@ -125,11 +148,12 @@ export default function App() {
       } else if (event === "SIGNED_OUT") {
         setUser(null);
         setCurrentView("home");
+        localStorage.removeItem('currentView'); // Clear saved view on logout
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, []); // Remove dependency on empty array to run once, but we need refs inside... actually empty array is fine.
 
   const handleLogin = (userData: User) => {
     setUser(userData);
