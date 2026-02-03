@@ -106,6 +106,10 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
   const [showCustomServiceInput, setShowCustomServiceInput] = useState(false);
   const [customFacility, setCustomFacility] = useState('');
   const [showCustomFacilityInput, setShowCustomFacilityInput] = useState(false);
+  const [customLanguage, setCustomLanguage] = useState('');
+  const [showCustomLanguageInput, setShowCustomLanguageInput] = useState(false);
+  const [customSpecialization, setCustomSpecialization] = useState('');
+  const [showCustomSpecializationInput, setShowCustomSpecializationInput] = useState(false);
 
   const handleFileChange = (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -129,6 +133,24 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
       setCustomFacility('');
       setShowCustomFacilityInput(false);
       toast.success("Custom facility added!");
+    }
+  };
+
+  const handleAddCustomLanguage = () => {
+    if (customLanguage.trim()) {
+      setSelectedLanguages(prev => [...prev, customLanguage.trim()]);
+      setCustomLanguage('');
+      setShowCustomLanguageInput(false);
+      toast.success("Custom language added!");
+    }
+  };
+
+  const handleAddCustomSpecialization = () => {
+    if (customSpecialization.trim()) {
+      setSelectedSpecializations(prev => [...prev, customSpecialization.trim()]);
+      setCustomSpecialization('');
+      setShowCustomSpecializationInput(false);
+      toast.success("Custom specialization added!");
     }
   };
 
@@ -595,6 +617,38 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
                         <p className="text-xs font-medium">{spec}</p>
                       </div>
                     ))}
+                    {/* Custom Specializations Display */}
+                    {selectedSpecializations.filter(s => !specializations.includes(s)).map((spec) => (
+                      <div
+                        key={spec}
+                        onClick={() => toggleSelection(spec, selectedSpecializations, setSelectedSpecializations)}
+                        className="p-2 border rounded-lg cursor-pointer text-center transition-colors bg-pink-600 text-white border-pink-600"
+                      >
+                        <p className="text-xs font-medium">{spec}</p>
+                      </div>
+                    ))}
+
+                    {/* Add Other Button */}
+                    {!showCustomSpecializationInput ? (
+                      <div
+                        onClick={() => setShowCustomSpecializationInput(true)}
+                        className="p-2 border border-dashed border-gray-400 rounded-lg cursor-pointer hover:border-pink-400 hover:bg-pink-50 transition-colors flex items-center justify-center"
+                      >
+                        <p className="text-xs font-medium text-gray-600">+ Other</p>
+                      </div>
+                    ) : (
+                      <div className="p-2 border border-pink-200 rounded-lg bg-white flex items-center gap-2">
+                        <Input
+                          value={customSpecialization}
+                          onChange={(e) => setCustomSpecialization(e.target.value)}
+                          placeholder="Type specialization..."
+                          className="h-6 text-xs"
+                        />
+                        <Button size="sm" onClick={handleAddCustomSpecialization} className="h-6 w-6 p-0 bg-pink-600">
+                          <CheckCircle className="size-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -613,6 +667,38 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
                         <p className="text-xs font-medium">{lang}</p>
                       </div>
                     ))}
+                    {/* Custom Languages Display */}
+                    {selectedLanguages.filter(l => !languages.includes(l)).map((lang) => (
+                      <div
+                        key={lang}
+                        onClick={() => toggleSelection(lang, selectedLanguages, setSelectedLanguages)}
+                        className="p-2 border rounded-lg cursor-pointer text-center transition-colors bg-purple-600 text-white border-purple-600"
+                      >
+                        <p className="text-xs font-medium">{lang}</p>
+                      </div>
+                    ))}
+
+                    {/* Add Other Button */}
+                    {!showCustomLanguageInput ? (
+                      <div
+                        onClick={() => setShowCustomLanguageInput(true)}
+                        className="p-2 border border-dashed border-gray-400 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors flex items-center justify-center"
+                      >
+                        <p className="text-xs font-medium text-gray-600">+ Other</p>
+                      </div>
+                    ) : (
+                      <div className="p-2 border border-purple-200 rounded-lg bg-white flex items-center gap-2">
+                        <Input
+                          value={customLanguage}
+                          onChange={(e) => setCustomLanguage(e.target.value)}
+                          placeholder="Type language..."
+                          className="h-6 text-xs"
+                        />
+                        <Button size="sm" onClick={handleAddCustomLanguage} className="h-6 w-6 p-0 bg-purple-600">
+                          <CheckCircle className="size-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>

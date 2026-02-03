@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { User, UserRole } from '../App';
-import { Building2, Lock, Mail, Smartphone, KeyRound } from 'lucide-react';
+import { Building2, Lock, Mail, Smartphone, KeyRound, ArrowLeft } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -103,6 +103,14 @@ export function LoginPage({ onLogin, onBack, onRegister }: LoginPageProps) {
               <p className="text-sm text-gray-600">Clinic Management Platform</p>
             </div>
           </div>
+
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 mb-6 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </button>
 
           <Tabs defaultValue="email" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">

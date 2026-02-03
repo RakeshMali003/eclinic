@@ -205,13 +205,12 @@ export default function App() {
       return <Login onLogin={handleLogin} onBack={() => setCurrentView("home")} onRegister={handleRegister} />;
     }
 
-    // Registration Views
     if (currentView === "register-clinic") {
-      return <ClinicRegistration onComplete={handleRegistrationComplete} onBack={() => setCurrentView("login")} />;
+      return <ClinicRegistration onBack={() => setCurrentView("login")} />;
     }
 
     if (currentView === "register-doctor") {
-      return <DoctorRegistration onComplete={handleRegistrationComplete} onBack={() => setCurrentView("login")} />;
+      return <DoctorRegistration onBack={() => setCurrentView("login")} />;
     }
 
     // Core Service Pages
@@ -269,7 +268,8 @@ export default function App() {
       return <Contact onNavigate={navigateTo} />;
     }
 
-    // Patient Portal Views
+    // Patient Portal Views - Commented out due to missing component imports
+    /*
     if (currentView === "patient-book-appointment") {
       return <BookAppointment user={user} onBack={() => setCurrentView("dashboard")} />;
     }
@@ -305,8 +305,10 @@ export default function App() {
     if (currentView === "patient-ai-tools") {
       return <AIHealthTools user={user} onBack={() => setCurrentView("dashboard")} />;
     }
+    */
 
-    // Clinic Management Views
+    // Clinic Management Views - Commented out due to missing component imports
+    /*
     if (currentView === "clinic-appointments") {
       return <AppointmentManagement user={user} onBack={() => setCurrentView("dashboard")} />;
     }
@@ -370,6 +372,7 @@ export default function App() {
     if (currentView === "clinic-profile") {
       return <ClinicProfile user={user} onBack={() => setCurrentView("dashboard")} />;
     }
+    */
 
     if (currentView === "loading") {
       return (
