@@ -103,6 +103,12 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
   const [files, setFiles] = useState<Record<string, File>>({});
   const [customService, setCustomService] = useState('');
   const [showCustomServiceInput, setShowCustomServiceInput] = useState(false);
+  const [customSpecialization, setCustomSpecialization] = useState('');
+  const [showCustomSpecializationInput, setShowCustomSpecializationInput] = useState(false);
+  const [customLanguage, setCustomLanguage] = useState('');
+  const [showCustomLanguageInput, setShowCustomLanguageInput] = useState(false);
+  const [customCondition, setCustomCondition] = useState('');
+  const [showCustomConditionInput, setShowCustomConditionInput] = useState(false);
 
   const handleFileChange = (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -120,6 +126,33 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
     }
   };
 
+  const handleAddCustomSpecialization = () => {
+    if (customSpecialization.trim()) {
+      setSelectedSpecializations(prev => [...prev, customSpecialization.trim()]);
+      setCustomSpecialization('');
+      setShowCustomSpecializationInput(false);
+      toast.success("Custom specialization added!");
+    }
+  };
+
+  const handleAddCustomLanguage = () => {
+    if (customLanguage.trim()) {
+      setSelectedLanguages(prev => [...prev, customLanguage.trim()]);
+      setCustomLanguage('');
+      setShowCustomLanguageInput(false);
+      toast.success("Custom language added!");
+    }
+  };
+
+  const handleAddCustomCondition = () => {
+    if (customCondition.trim()) {
+      setSelectedConditions(prev => [...prev, customCondition.trim()]);
+      setCustomCondition('');
+      setShowCustomConditionInput(false);
+      toast.success("Custom condition added!");
+    }
+  };
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateStep = (step: number) => {
@@ -130,6 +163,17 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
       if (!formData.fullName) newErrors.fullName = "Full Name is required";
       if (!formData.gender) newErrors.gender = "Gender is required";
       if (!formData.dob) newErrors.dob = "Date of Birth is required";
+      else {
+        const dob = new Date(formData.dob);
+        const today = new Date();
+        const age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate()) ? age - 1 : age;
+
+        if (dob > today) newErrors.dob = "Date of Birth cannot be in the future";
+        else if (actualAge < 18) newErrors.dob = "You must be at least 18 years old to register as a doctor";
+        else if (actualAge > 100) newErrors.dob = "Please enter a valid date of birth";
+      }
       if (!formData.mobile) newErrors.mobile = "Mobile Number is required";
       else if (formData.mobile.length !== 10) newErrors.mobile = "Mobile Number must be 10 digits";
       if (!formData.email) newErrors.email = "Email is required";
@@ -455,6 +499,38 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
               <p className="text-sm font-medium">{spec}</p>
             </div>
           ))}
+          {/* Custom Specializations Display */}
+          {selectedSpecializations.filter(s => !specializations.includes(s)).map((spec) => (
+            <div
+              key={spec}
+              onClick={() => toggleSelection(spec, selectedSpecializations, setSelectedSpecializations)}
+              className="p-3 border rounded-lg cursor-pointer transition-colors bg-pink-600 text-white border-pink-600"
+            >
+              <p className="text-sm font-medium">{spec}</p>
+            </div>
+          ))}
+
+          {/* Add Other Button */}
+          {!showCustomSpecializationInput ? (
+            <div
+              onClick={() => setShowCustomSpecializationInput(true)}
+              className="p-3 border border-dashed border-gray-400 rounded-lg cursor-pointer hover:border-pink-400 hover:bg-pink-50 transition-colors flex items-center justify-center"
+            >
+              <p className="text-sm font-medium text-gray-600">+ Other</p>
+            </div>
+          ) : (
+            <div className="p-3 border border-pink-200 rounded-lg bg-white flex items-center gap-2">
+              <Input
+                value={customSpecialization}
+                onChange={(e) => setCustomSpecialization(e.target.value)}
+                placeholder="Type specialization..."
+                className="h-8 text-sm"
+              />
+              <Button size="sm" onClick={handleAddCustomSpecialization} className="h-8 w-8 p-0 bg-pink-600">
+                <CheckCircle className="size-4" />
+              </Button>
+            </div>
+          )}
         </div>
         {errors.specializations && <p className="text-xs text-red-500 mt-1">{errors.specializations}</p>}
       </div>
@@ -474,6 +550,38 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
               <p className="text-sm font-medium">{lang}</p>
             </div>
           ))}
+          {/* Custom Languages Display */}
+          {selectedLanguages.filter(l => !languages.includes(l)).map((lang) => (
+            <div
+              key={lang}
+              onClick={() => toggleSelection(lang, selectedLanguages, setSelectedLanguages)}
+              className="p-3 border rounded-lg cursor-pointer transition-colors bg-purple-600 text-white border-purple-600"
+            >
+              <p className="text-sm font-medium">{lang}</p>
+            </div>
+          ))}
+
+          {/* Add Other Button */}
+          {!showCustomLanguageInput ? (
+            <div
+              onClick={() => setShowCustomLanguageInput(true)}
+              className="p-3 border border-dashed border-gray-400 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors flex items-center justify-center"
+            >
+              <p className="text-sm font-medium text-gray-600">+ Other</p>
+            </div>
+          ) : (
+            <div className="p-3 border border-purple-200 rounded-lg bg-white flex items-center gap-2">
+              <Input
+                value={customLanguage}
+                onChange={(e) => setCustomLanguage(e.target.value)}
+                placeholder="Type language..."
+                className="h-8 text-sm"
+              />
+              <Button size="sm" onClick={handleAddCustomLanguage} className="h-8 w-8 p-0 bg-purple-600">
+                <CheckCircle className="size-4" />
+              </Button>
+            </div>
+          )}
         </div>
         {errors.languages && <p className="text-xs text-red-500 mt-1">{errors.languages}</p>}
       </div>
@@ -626,6 +734,38 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
               <p className="text-sm font-medium">{condition}</p>
             </div>
           ))}
+          {/* Custom Conditions Display */}
+          {selectedConditions.filter(c => !conditionsTreated.includes(c)).map((condition) => (
+            <div
+              key={condition}
+              onClick={() => toggleSelection(condition, selectedConditions, setSelectedConditions)}
+              className="p-3 border rounded-lg cursor-pointer transition-colors bg-pink-600 text-white border-pink-600"
+            >
+              <p className="text-sm font-medium">{condition}</p>
+            </div>
+          ))}
+
+          {/* Add Other Button */}
+          {!showCustomConditionInput ? (
+            <div
+              onClick={() => setShowCustomConditionInput(true)}
+              className="p-3 border border-dashed border-gray-400 rounded-lg cursor-pointer hover:border-pink-400 hover:bg-pink-50 transition-colors flex items-center justify-center"
+            >
+              <p className="text-sm font-medium text-gray-600">+ Other</p>
+            </div>
+          ) : (
+            <div className="p-3 border border-pink-200 rounded-lg bg-white flex items-center gap-2">
+              <Input
+                value={customCondition}
+                onChange={(e) => setCustomCondition(e.target.value)}
+                placeholder="Type condition..."
+                className="h-8 text-sm"
+              />
+              <Button size="sm" onClick={handleAddCustomCondition} className="h-8 w-8 p-0 bg-pink-600">
+                <CheckCircle className="size-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 

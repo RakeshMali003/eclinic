@@ -1,5 +1,5 @@
 import { cn } from "./utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface Particle {
   id: number;
@@ -23,7 +23,7 @@ export function ParticleBackground({
   colors = ["#ec4899", "#a855f7", "#3b82f6", "#10b981"]
 }: ParticleBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [particles, setParticles] = useState<Particle[]>([]);
+  const particlesRef = useRef<Particle[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -36,7 +36,6 @@ export function ParticleBackground({
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
-
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
@@ -54,13 +53,13 @@ export function ParticleBackground({
         opacity: Math.random() * 0.5 + 0.2
       });
     }
-    setParticles(newParticles);
+    particlesRef.current = newParticles;
 
     let animationId: number;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      newParticles.forEach((particle) => {
+      particlesRef.current.forEach((particle) => {
         // Update position
         particle.x += particle.speedX;
         particle.y += particle.speedY;
@@ -79,8 +78,8 @@ export function ParticleBackground({
       });
 
       // Draw connections
-      newParticles.forEach((particle1, i) => {
-        newParticles.slice(i + 1).forEach((particle2) => {
+      particlesRef.current.forEach((particle1, i) => {
+        particlesRef.current.slice(i + 1).forEach((particle2) => {
           const distance = Math.sqrt(
             Math.pow(particle1.x - particle2.x, 2) +
             Math.pow(particle1.y - particle2.y, 2)
@@ -129,16 +128,16 @@ export function FloatingElements({ className, children }: FloatingElementsProps)
       <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-3xl animate-float"></div>
       <div className="absolute top-1/3 right-20 w-40 h-40 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full blur-3xl animate-float delay-1000"></div>
       <div className="absolute bottom-20 left-1/4 w-36 h-36 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-float delay-2000"></div>
-
+      
       {/* Floating shapes */}
       <div className="absolute top-1/4 left-1/3 w-8 h-8 bg-pink-500/30 rounded-full animate-pulse-glow"></div>
       <div className="absolute top-1/2 right-1/4 w-12 h-12 bg-purple-500/30 rounded-lg animate-rotate-slow"></div>
       <div className="absolute bottom-1/3 left-1/2 w-6 h-6 bg-blue-500/30 rounded-full animate-bounce-subtle"></div>
-
+      
       {/* Gradient overlays */}
       <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 via-transparent to-purple-500/5"></div>
       <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 via-transparent to-cyan-500/5"></div>
-
+      
       {children}
     </div>
   );

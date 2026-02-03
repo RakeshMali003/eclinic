@@ -60,6 +60,7 @@ export function PatientProfile({ patient }: PatientProfileProps) {
   const [newAllergy, setNewAllergy] = useState('');
   const [newMedication, setNewMedication] = useState('');
   const [newDisease, setNewDisease] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleAddItem = (
     value: string,
@@ -79,6 +80,39 @@ export function PatientProfile({ patient }: PatientProfileProps) {
     setItems: (items: string[]) => void
   ) => {
     setItems(items.filter((_, i) => i !== index));
+  };
+
+  const validateDateOfBirth = (dob: string) => {
+    if (!dob) return "Date of Birth is required";
+
+    const dobDate = new Date(dob);
+    const today = new Date();
+
+    if (dobDate > today) return "Date of Birth cannot be in the future";
+
+    const age = today.getFullYear() - dobDate.getFullYear();
+    const monthDiff = today.getMonth() - dobDate.getMonth();
+    const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate()) ? age - 1 : age;
+
+    if (actualAge > 150) return "Please enter a valid date of birth";
+    if (actualAge < 0) return "Date of Birth cannot be in the future";
+
+    return "";
+  };
+
+  const handleSaveProfile = () => {
+    const dobInput = document.getElementById('dob') as HTMLInputElement;
+    const dobValue = dobInput?.value || '';
+    const dobError = validateDateOfBirth(dobValue);
+
+    if (dobError) {
+      setErrors({ dob: dobError });
+      return;
+    }
+
+    setErrors({});
+    // Save profile logic here
+    setIsEditing(false);
   };
 
   return (
