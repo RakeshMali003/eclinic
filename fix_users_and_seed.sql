@@ -4,57 +4,71 @@
 --    We will recreate the table to match Supabase Auth standards.
 -- ============================================================================
 
--- Drop existing table if it exists (WARNING: DELETES EXISTING USER DATA in public.users)
+-- Drop existing table and related objects to ensure clean state
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
 DROP TABLE IF EXISTS public.users CASCADE;
 
--- Create correct table
+-- Create correct table matching authService.ts expectations
 CREATE TABLE public.users (
   id UUID NOT NULL PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT,
   full_name TEXT,
   avatar_url TEXT,
   role TEXT DEFAULT 'patient', -- 'patient', 'doctor', 'clinic', 'admin'
-  phone TEXT,
+  mobile_number TEXT,
+  is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
--- Enable Row Level Security (Security Best Practice)
+-- Enable Row Level Security
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can view their own profile
+-- Policies
 CREATE POLICY "Users can view own profile" 
   ON public.users FOR SELECT 
   USING (auth.uid() = id);
 
--- Policy: Users can update their own profile
 CREATE POLICY "Users can update own profile" 
   ON public.users FOR UPDATE 
   USING (auth.uid() = id);
 
 -- ============================================================================
--- 2. AUTOMATIC TRIGGER FOR NEW USERS (Fixes Google Login Issue)
---    This ensures that whenever a user signs up (Google or Email),
---    a row is automatically created in public.users.
+-- 2. AUTOMATIC TRIGGER FOR NEW USERS
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.handle_new_user() 
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER 
+SECURITY DEFINER SET search_path = public
+AS $$
 BEGIN
-  INSERT INTO public.users (id, email, full_name, avatar_url, role)
+  INSERT INTO public.users (id, email, full_name, avatar_url, role, is_active)
   VALUES (
     new.id,
     new.email,
     COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
     new.raw_user_meta_data->>'avatar_url',
-    COALESCE(new.raw_user_meta_data->>'role', 'patient') -- Default to patient if no role specified
-  );
+    COALESCE(new.raw_user_meta_data->>'role', 'patient'),
+    TRUE
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    full_name = COALESCE(public.users.full_name, EXCLUDED.full_name),
+    avatar_url = COALESCE(public.users.avatar_url, EXCLUDED.avatar_url),
+    updated_at = now();
+    
   RETURN new;
+EXCEPTION
+  WHEN others THEN
+    -- Log error but don't fail transaction if possible, or raise a cleaner error
+    -- For Auth triggers, raising an error aborts user creation.
+    -- We want to ensure we don't block auth for trivial DB errors, 
+    -- but usually if this fails, account creation IS broken.
+    RAISE LOG 'Error in handle_new_user: %', SQLERRM;
+    RETURN new; -- Try to proceed allowing auth user creation even if profile fails (risky but unblocks auth)
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Recreate trigger (drop first to avoid errors if running multiple times)
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users

@@ -2,6 +2,8 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const supabase = require('./supabase');
 const { v4: uuidv4 } = require('uuid');
+const logger = require('../utils/logger');
+const { syncUserToAuth } = require('../utils/userSync');
 
 passport.use(
   new GoogleStrategy(
@@ -14,13 +16,18 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Search by google_id
+        logger.info('AUTH_OAUTH', 'Processing Google OAuth login', { google_id: profile.id, email: profile.emails?.[0]?.value });
+
+        // Search in users table by google_id
         let { data: users, error } = await supabase
           .from('users')
           .select('*')
           .eq('google_id', profile.id);
 
-        if (error) throw error;
+        if (error) {
+          logger.error('AUTH_DB_ERROR', 'Error searching for user by google_id', { error });
+          throw error;
+        }
 
         let user;
 
@@ -32,15 +39,19 @@ passport.use(
             .select('*')
             .eq('email', email);
 
-          if (emailError) throw emailError;
+          if (emailError) {
+            logger.error('AUTH_DB_ERROR', 'Error searching for user by email', { email, error: emailError });
+            throw emailError;
+          }
 
           if (!existingUsers || existingUsers.length === 0) {
-            // Create new user with manual ID
+            // Create new user
+            const userId = uuidv4();
             const { data: newUser, error: insertError } = await supabase
               .from('users')
               .insert([
                 {
-                  id: uuidv4(),
+                  id: userId,
                   full_name: profile.displayName,
                   email: email,
                   google_id: profile.id,
@@ -51,8 +62,17 @@ passport.use(
               .select()
               .single();
 
-            if (insertError) throw insertError;
+            if (insertError) {
+              logger.error('AUTH_SIGNUP_ERROR', 'Error creating new user in users table', { email, error: insertError });
+              throw insertError;
+            }
+
             user = newUser;
+            logger.success('AUTH_SIGNUP', 'New user registered via Google', { user_id: userId, email });
+
+            // Sync to auth_users table
+            await syncUserToAuth(email, 'patient');
+
           } else {
             // Update existing user with google_id
             const { data: updatedUser, error: updateError } = await supabase
@@ -62,16 +82,21 @@ passport.use(
               .select()
               .single();
 
-            if (updateError) throw updateError;
+            if (updateError) {
+              logger.error('AUTH_UPDATE_ERROR', 'Error updating user with google_id', { user_id: existingUsers[0].id, error: updateError });
+              throw updateError;
+            }
             user = updatedUser;
+            logger.info('AUTH_LOGIN', 'Existing user logged in via Google (linked google_id)', { user_id: user.id, email });
           }
         } else {
           user = users[0];
+          logger.info('AUTH_LOGIN', 'User logged in via Google', { user_id: user.id, email: user.email });
         }
 
         return done(null, user);
       } catch (error) {
-        console.error('Passport strategy error:', error);
+        logger.error('AUTH_STRATEGY_ERROR', 'Passport strategy execution failed', { error: error.message });
         return done(error, null);
       }
     }

@@ -22,6 +22,7 @@ import { Contact } from "./components/Contact";
 // Registration Components
 import { ClinicRegistration } from "./components/ClinicRegistration";
 import { DoctorRegistration } from "./components/DoctorRegistration";
+import { PatientRegistration } from "./components/PatientRegistration";
 
 // Patient Portal Components
 import { PatientPortal } from "./components/PatientPortal";
@@ -67,6 +68,8 @@ export interface User {
   email: string;
   role: UserRole;
   avatar?: string;
+  clinicId?: string | number; // Added for multi-tenancy
+  phone?: string;
 }
 
 export default function App() {
@@ -97,7 +100,7 @@ export default function App() {
         if (userWithRole) {
           setUser(userWithRole);
           // Only redirect to dashboard if we are at home or login, otherwise respect persisted view
-          if (currentView === "home" || currentView === "login") {
+          if (currentView === "home" || currentView === "login" || currentView.startsWith("register-")) {
             setCurrentView("dashboard");
           }
 
@@ -138,7 +141,7 @@ export default function App() {
         if (userWithRole) {
           setUser(userWithRole);
           // If just signing in, go to dashboard
-          if (currentView === "home" || currentView === "login") {
+          if (currentView === "home" || currentView === "login" || currentView.startsWith("register-")) {
             setCurrentView("dashboard");
           }
           if (window.location.pathname === "/auth/callback") {
@@ -185,9 +188,7 @@ export default function App() {
     } else if (role === "doctor") {
       setCurrentView("register-doctor");
     } else {
-      // For patient, can use a simpler form or direct to login
-      alert("Patient registration will use quick signup with mobile OTP");
-      setCurrentView("login");
+      setCurrentView("register-patient");
     }
   };
 
@@ -211,6 +212,10 @@ export default function App() {
 
     if (currentView === "register-doctor") {
       return <DoctorRegistration onBack={() => setCurrentView("login")} />;
+    }
+
+    if (currentView === "register-patient") {
+      return <PatientRegistration onBack={() => setCurrentView("login")} />;
     }
 
     // Core Service Pages
@@ -389,19 +394,19 @@ export default function App() {
         case "patient":
           return <PatientPortal user={user} onLogout={handleLogout} />;
         case "doctor":
-          return <DoctorDashboard />;
+          return <DoctorDashboard user={user} />;
         case "clinic":
-          return <ClinicDashboard />;
+          return <ClinicDashboard user={user} />;
         case "reception":
-          return <ReceptionDashboard />;
+          return <ReceptionDashboard user={user} />;
         case "nurse":
-          return <NurseDashboard />;
+          return <NurseDashboard user={user} />;
         case "lab":
-          return <LabDashboard />;
+          return <LabDashboard user={user} />;
         case "pharmacy":
-          return <PharmacyDashboard />;
+          return <PharmacyDashboard user={user} />;
         case "admin":
-          return <AdminDashboard />;
+          return <AdminDashboard user={user} />;
         default:
           return (
             <div className="flex flex-col items-center justify-center min-h-screen">
