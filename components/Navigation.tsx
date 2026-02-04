@@ -57,28 +57,33 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
           {/* Desktop Main Menu */}
           <div className="hidden lg:flex items-center gap-6">
             {mainMenuItems.map((item) => (
-              <button
-                key={item.view}
-                onClick={() => onNavigate(item.view)}
-                className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
-              >
-                <span className="relative z-10 text-foreground/90 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
-                  {item.label}
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
-              </button>
+           <button
+  key={item.view}
+  onClick={() => onNavigate(item.view)}
+  className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
+>
+  <span className="relative z-10 text-foreground/90 group-hover:text-black transition-all duration-300">
+    {item.label}
+  </span>
+
+  <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
+</button>
             ))}
-            <button
-              onClick={() => onNavigate("contact")}
-              className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
-            >
-              <span className="relative z-10 text-foreground/90 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
-                Contact
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
-            </button>
+          <button
+  onClick={() => onNavigate("contact")}
+  className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
+>
+  <span className="relative z-10 text-foreground/90 group-hover:text-black transition-all duration-300">
+    Contact
+  </span>
+
+  <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+</button>
+
           </div>
 
           {/* Right Side Actions */}
