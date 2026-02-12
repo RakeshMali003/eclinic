@@ -1,6 +1,6 @@
 import { Button } from "./ui/button";
-import { 
-  Heart, 
+import {
+  Heart,
   ShoppingCart,
   Pill,
   FlaskConical,
@@ -44,48 +44,54 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
 
   return (
     <nav className="border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* Top Nav */}
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => onNavigate("home")}> 
+          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => onNavigate("home")}>
             <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-fuchsia-500 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
               <Heart className="w-6 h-6 text-white animate-pulse" />
             </div>
             <span className="text-xl text-foreground font-semibold group-hover:text-primary transition-colors duration-300">E-Clinic</span>
           </div>
-          
+
           {/* Desktop Main Menu */}
           <div className="hidden lg:flex items-center gap-6">
             {mainMenuItems.map((item) => (
-              <button
-                key={item.view}
-                onClick={() => onNavigate(item.view)}
-                className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
-              >
-                <span className="relative z-10 text-foreground/90 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
-                  {item.label}
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
-              </button>
-            ))}
             <button
-              onClick={() => onNavigate("contact")}
-              className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
-            >
-              <span className="relative z-10 text-foreground/90 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
-                Contact
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
-            </button>
+  key={item.view}
+  onClick={() => onNavigate(item.view)}
+  className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
+>
+  <span className="relative z-10 text-foreground/90 group-hover:text-black transition-all duration-300">
+    {item.label}
+  </span>
+
+  <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
+</button>
+
+            ))}
+        <button
+  onClick={() => onNavigate("contact")}
+  className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
+>
+  <span className="relative z-10 text-foreground/90 group-hover:text-black transition-all duration-300">
+    Contact
+  </span>
+
+  <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+</button>
+
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle />
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className="hidden sm:flex"
             >
@@ -96,8 +102,8 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
                 </span>
               )}
             </Button>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               onClick={() => onNavigate("login")}
               className="hidden sm:flex"
             >
@@ -108,8 +114,8 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
                 Get Started
               </Button>
             )}
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -147,7 +153,7 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
                   Contact
                 </button>
               </div>
-              
+
               {/* Divider */}
               <div className="border-t border-border pt-4">
                 <div className="space-y-3">
@@ -173,7 +179,7 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
                   )}
                 </div>
               </div>
-              
+
               {/* Category Items */}
               <div className="border-t border-border pt-4">
                 <div className="grid grid-cols-2 gap-2">
@@ -197,7 +203,7 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
         )}
 
         {/* Category Navigation */}
-        <div className="border-t border-border hidden md:block bg-gradient-to-r from-secondary/50 to-secondary/30 backdrop-blur-sm">
+        <div className="border-t  ">
           <div className="flex items-center gap-4 sm:gap-6 py-2 sm:py-3 overflow-x-auto">
             {categoryItems.map((item) => (
               <button

@@ -33,10 +33,35 @@ import { LabDashboard } from "./components/role-dashboards/LabDashboard";
 import { PharmacyDashboard } from "./components/role-dashboards/PharmacyDashboard";
 import { AdminDashboard } from "./components/role-dashboards/AdminDashboard";
 import { getUserWithRole, authService } from "./services/authService";
-import { supabase } from "./lib/supabase";
 import { ClinicProfile } from "./components/ClinicProfile";
+import { AppointmentManagement } from "./components/AppointmentManagement";
+import { PatientManagement } from "./components/PatientManagement";
+import { DoctorManagement } from "./components/DoctorManagement";
+import { StaffManagement } from "./components/StaffManagement";
+import { BillingPayments } from "./components/BillingPayments";
+import { PharmacyInventory } from "./components/PharmacyInventory";
+import { LabDiagnostics } from "./components/LabDiagnostics";
+import { PrescriptionRecords } from "./components/PrescriptionRecords";
+import { QueueManagement } from "./components/QueueManagement";
+import { ReportsAnalytics } from "./components/ReportsAnalytics";
+import { IoTIntegration } from "./components/IoTIntegration";
+import { AIModules } from "./components/AIModules";
+import { SecurityCompliance } from "./components/SecurityCompliance";
+import { Settings } from "./components/Settings";
+import { Notifications } from "./components/Notifications";
 
-export type UserRole = "patient" | "doctor" | "clinic" | "reception" | "nurse" | "lab" | "pharmacy" | "admin" | null;
+// Patient Portal Components
+import { BookAppointment } from "./components/patient-portal/BookAppointment";
+import { MyAppointments } from "./components/patient-portal/MyAppointments";
+import { MyPrescriptions } from "./components/patient-portal/MyPrescriptions";
+import { MyReports } from "./components/patient-portal/MyReports";
+import { MyBilling } from "./components/patient-portal/MyBilling";
+import { PatientProfile } from "./components/patient-portal/PatientProfile";
+import { MedicineStore } from "./components/patient-portal/MedicineStore";
+import { VideoConsultation } from "./components/patient-portal/VideoConsultation";
+import { AIHealthTools } from "./components/patient-portal/AIHealthTools";
+
+export type UserRole = "patient" | "doctor" | "clinic" | "receptionist" | "nurse" | "lab" | "pharmacy" | "admin" | null;
 
 export type PageView =
   // Core Pages
@@ -59,7 +84,7 @@ export type PageView =
   | "clinic-profile"
   // Specific Role Dashboards (if needed separately)
   | "doctor-dashboard" | "reception-dashboard" | "nurse-dashboard"
-  | "lab-dashboard" | "pharmacy-dashboard";
+  | "lab-dashboard" | "pharmacy-dashboard" | "patient-dashboard" | "clinic-dashboard" | "admin-dashboard";
 
 export interface User {
   id: string;
@@ -76,31 +101,100 @@ export default function App() {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const userWithRole = await getUserWithRole();
-        if (userWithRole) {
-          setUser(userWithRole);
-          setCurrentView("dashboard");
-          // Clear callback path if present
-          if (window.location.pathname === "/auth/callback") {
-            window.history.replaceState({}, document.title, "/");
+        // Check for auth callback parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const userParam = urlParams.get('user');
+
+        if (token && userParam) {
+          // Handle auth callback from backend
+          localStorage.setItem('auth_token', token);
+          const userData = JSON.parse(decodeURIComponent(userParam));
+          // Validate role
+          const validRoles = ['patient', 'doctor', 'clinic', 'receptionist', 'nurse', 'lab', 'pharmacy', 'admin'];
+          if (!validRoles.includes(userData.role)) {
+            userData.role = 'patient';
           }
+          const user = {
+            id: userData.user_id,
+            name: userData.full_name,
+            email: userData.email,
+            role: userData.role as UserRole,
+          };
+          setUser(user);
+          // Cache the user in localStorage
+          localStorage.setItem('user', JSON.stringify(user));
+          switch (userData.role.toLowerCase()) {
+            case "patient":
+              setCurrentView("patient-dashboard");
+              break;
+            case "doctor":
+              setCurrentView("doctor-dashboard");
+              break;
+            case "clinic":
+              setCurrentView("clinic-dashboard");
+              break;
+            case "receptionist":
+              setCurrentView("reception-dashboard");
+              break;
+            case "nurse":
+              setCurrentView("nurse-dashboard");
+              break;
+            case "lab":
+              setCurrentView("lab-dashboard");
+              break;
+            case "pharmacy":
+              setCurrentView("pharmacy-dashboard");
+              break;
+            case "admin":
+              setCurrentView("admin-dashboard");
+              break;
+            default:
+              setCurrentView("dashboard");
+          }
+          // Clear URL parameters
+          window.history.replaceState({}, document.title, "/");
         } else {
-          // If we're on the callback path but no user is found after init, 
-          // we might be waiting for the onAuthStateChange event.
-          // However, if we're NOT on callback, go home.
-          if (window.location.pathname !== "/auth/callback") {
-            setCurrentView("home");
+          // Check for existing session
+          const userWithRole = await getUserWithRole();
+          if (userWithRole) {
+            console.log("initAuth: got userWithRole:", userWithRole);
+            // Validate role
+            const validRoles = ['patient', 'doctor', 'clinic', 'receptionist', 'nurse', 'lab', 'pharmacy', 'admin'];
+            if (!userWithRole.role || !validRoles.includes(userWithRole.role)) {
+              userWithRole.role = 'patient';
+            }
+            setUser(userWithRole);
+            switch (userWithRole.role) {
+              case "patient":
+                setCurrentView("patient-dashboard");
+                break;
+              case "doctor":
+                setCurrentView("doctor-dashboard");
+                break;
+              case "clinic":
+                setCurrentView("clinic-dashboard");
+                break;
+              case "receptionist":
+                setCurrentView("reception-dashboard");
+                break;
+              case "nurse":
+                setCurrentView("nurse-dashboard");
+                break;
+              case "lab":
+                setCurrentView("lab-dashboard");
+                break;
+              case "pharmacy":
+                setCurrentView("pharmacy-dashboard");
+                break;
+              case "admin":
+                setCurrentView("admin-dashboard");
+                break;
+              default:
+                setCurrentView("dashboard");
+            }
           } else {
-            // On callback but no user yet, show loading
-            setCurrentView("loading");
-            // Set a timeout as a fail-safe to avoid permanent hang
-            setTimeout(() => {
-              if (window.location.pathname === "/auth/callback" && !user) {
-                console.log("Auth callback timeout - redirecting home");
-                setCurrentView("home");
-                window.history.replaceState({}, document.title, "/");
-              }
-            }, 5000);
+            setCurrentView("home");
           }
         }
       } catch (error) {
@@ -110,30 +204,41 @@ export default function App() {
     };
 
     initAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, _session) => {
-      console.log("Auth event:", event);
-      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        const userWithRole = await getUserWithRole();
-        if (userWithRole) {
-          setUser(userWithRole);
-          setCurrentView("dashboard");
-          if (window.location.pathname === "/auth/callback") {
-            window.history.replaceState({}, document.title, "/");
-          }
-        }
-      } else if (event === "SIGNED_OUT") {
-        setUser(null);
-        setCurrentView("home");
-      }
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogin = (userData: User) => {
+    console.log("handleLogin called with:", userData);
+    // Persist user to localStorage first
+    localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
-    setCurrentView("dashboard");
+    switch (userData.role?.toLowerCase()) {
+      case "patient":
+        setCurrentView("patient-dashboard");
+        break;
+      case "doctor":
+        setCurrentView("doctor-dashboard");
+        break;
+      case "clinic":
+        setCurrentView("clinic-dashboard");
+        break;
+      case "receptionist":
+        setCurrentView("reception-dashboard");
+        break;
+      case "nurse":
+        setCurrentView("nurse-dashboard");
+        break;
+      case "lab":
+        setCurrentView("lab-dashboard");
+        break;
+      case "pharmacy":
+        setCurrentView("pharmacy-dashboard");
+        break;
+      case "admin":
+        setCurrentView("admin-dashboard");
+        break;
+      default:
+        setCurrentView("clinic-dashboard");
+    }
   };
 
   const handleLogout = async () => {
@@ -356,30 +461,62 @@ export default function App() {
       );
     }
 
+    if (currentView === "patient-dashboard" && user) {
+      return <PatientPortal user={user} onLogout={handleLogout} />;
+    }
+
+    if (currentView === "doctor-dashboard" && user) {
+      return <DoctorDashboard user={user} />;
+    }
+
+    if (currentView === "clinic-dashboard" && user) {
+      return <ClinicDashboard user={user} />;
+    }
+
+    if (currentView === "reception-dashboard" && user) {
+      return <ReceptionDashboard user={user} />;
+    }
+
+    if (currentView === "nurse-dashboard" && user) {
+      return <NurseDashboard user={user} />;
+    }
+
+    if (currentView === "lab-dashboard" && user) {
+      return <LabDashboard user={user} />;
+    }
+
+    if (currentView === "pharmacy-dashboard" && user) {
+      return <PharmacyDashboard user={user} />;
+    }
+
+    if (currentView === "admin-dashboard" && user) {
+      return <AdminDashboard user={user} />;
+    }
+
     // Dashboard Views (Role-based)
     if (currentView === "dashboard" && user) {
-      switch (user.role) {
+      switch (user.role?.toLowerCase()) {
         case "patient":
           return <PatientPortal user={user} onLogout={handleLogout} />;
         case "doctor":
-          return <DoctorDashboard />;
+          return <DoctorDashboard user={user} />;
         case "clinic":
-          return <ClinicDashboard />;
-        case "reception":
-          return <ReceptionDashboard />;
+          return <ClinicDashboard user={user} />;
+        case "receptionist":
+          return <ReceptionDashboard user={user} />;
         case "nurse":
-          return <NurseDashboard />;
+          return <NurseDashboard user={user} />;
         case "lab":
-          return <LabDashboard />;
+          return <LabDashboard user={user} />;
         case "pharmacy":
-          return <PharmacyDashboard />;
+          return <PharmacyDashboard user={user} />;
         case "admin":
-          return <AdminDashboard />;
+          return <AdminDashboard user={user} />;
         default:
           return (
             <div className="flex flex-col items-center justify-center min-h-screen">
               <h1 className="text-2xl font-bold text-red-600">Unauthorized</h1>
-              <p className="text-gray-600">You do not have permission to access this dashboard.</p>
+              <p className="text-gray-600">You do not have permission to access this dashboard. Role: {user.role}</p>
               <button onClick={() => setCurrentView("home")} className="mt-4 text-blue-600 hover:underline">Return Home</button>
             </div>
           );

@@ -1,5 +1,10 @@
 import { Dashboard } from "../Dashboard";
+import { User } from "../../App";
 
-export function NurseDashboard() {
-    return <Dashboard userRole="nurse" />;
+interface NurseDashboardProps {
+  user: User;
+}
+
+export function NurseDashboard({ user }: NurseDashboardProps) {
+    return <Dashboard user={user} />;
 }

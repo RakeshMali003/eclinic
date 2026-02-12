@@ -14,15 +14,7 @@ interface LoginPageProps {
   onRegister: (role: 'patient' | 'doctor' | 'clinic') => void;
 }
 
-const demoUsers = [
-  { id: '1', name: 'Dr. Sarah Johnson', email: 'admin@clinic.com', role: 'admin' as UserRole, password: 'admin', mobile: '+91 98765 43210' },
-  { id: '2', name: 'Dr. Michael Chen', email: 'doctor@clinic.com', role: 'doctor' as UserRole, password: 'doctor', mobile: '+91 98765 43211' },
-  { id: '3', name: 'Emma Wilson', email: 'reception@clinic.com', role: 'receptionist' as UserRole, password: 'reception', mobile: '+91 98765 43212' },
-  { id: '4', name: 'John Doe', email: 'nurse@clinic.com', role: 'nurse' as UserRole, password: 'nurse', mobile: '+91 98765 43213' },
-  { id: '5', name: 'Lisa Martinez', email: 'lab@clinic.com', role: 'lab_technician' as UserRole, password: 'lab', mobile: '+91 98765 43214' },
-  { id: '6', name: 'Robert Brown', email: 'pharmacy@clinic.com', role: 'pharmacist' as UserRole, password: 'pharmacy', mobile: '+91 98765 43215' },
-  { id: '7', name: 'Rahul Sharma', email: 'patient@clinic.com', role: 'patient' as UserRole, password: 'patient', mobile: '+91 98765 43216' },
-];
+
 
 export function LoginPage({ onLogin, onBack, onRegister }: LoginPageProps) {
   const [email, setEmail] = useState('');
@@ -63,29 +55,35 @@ export function LoginPage({ onLogin, onBack, onRegister }: LoginPageProps) {
     }
   };
 
-  const handleSendOTP = (e: React.FormEvent) => {
+  const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
-    const user = demoUsers.find(u => u.mobile === mobile);
+    setError('');
+    setIsLoading(true);
 
-    if (user) {
+    try {
+      // TODO: Implement OTP sending via backend API
       setOtpSent(true);
-      setError('');
-      toast.info('OTP Sent (Demo: 123456)');
-    } else {
-      setError('Mobile number not registered');
+      toast.info('OTP sent to your mobile number');
+    } catch (err: any) {
+      setError(err.message || 'Failed to send OTP');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleOTPLogin = (e: React.FormEvent) => {
+  const handleOTPLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (otp === '123456') {
-      const user = demoUsers.find(u => u.mobile === mobile);
-      if (user) {
-        const { password: _, ...userWithoutPassword } = user;
-        onLogin(userWithoutPassword);
-      }
-    } else {
-      setError('Invalid OTP');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      // TODO: Implement OTP verification via backend API
+      // For now, this is a placeholder
+      toast.error('OTP login not implemented yet');
+    } catch (err: any) {
+      setError(err.message || 'OTP verification failed');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -281,17 +279,7 @@ export function LoginPage({ onLogin, onBack, onRegister }: LoginPageProps) {
             </TabsContent>
           </Tabs>
 
-          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-600 font-medium mb-2">Demo Accounts:</p>
-            <div className="space-y-1 text-xs text-gray-500">
-              {demoUsers.map(user => (
-                <div key={user.id} className="flex justify-between">
-                  <span>{user.email}</span>
-                  <span className="text-gray-400">pwd: {user.password}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 mb-3">New to E-Clinic?</p>

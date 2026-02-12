@@ -1,40 +1,36 @@
-const supabase = require('../config/supabase');
+const prisma = require('../config/database');
 
 class User {
     static async create(userData) {
         const { full_name, email, mobile_number, role, password_hash } = userData;
-        const { data, error } = await supabase
-            .from('users')
-            .insert([
-                { full_name, email, mobile_number, role: role || 'PATIENT', password_hash }
-            ])
-            .select()
-            .single();
-
-        if (error) throw error;
-        return data;
+        return await prisma.users.create({
+            data: {
+                full_name,
+                email,
+                mobile_number,
+                role: role || 'patient',
+                password_hash
+            }
+        });
     }
 
     static async findByEmail(email) {
-        const { data, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email)
-            .maybeSingle();
-
-        if (error) throw error;
-        return data;
+        return await prisma.users.findUnique({
+            where: { email }
+        });
     }
 
-    static async findById(id) {
-        const { data, error } = await supabase
-            .from('users')
-            .select('id, full_name, email, mobile_number, role')
-            .eq('id', id)
-            .maybeSingle();
+    static async findById(user_id) {
+        return await prisma.users.findUnique({
+            where: { user_id }
+        });
+    }
 
-        if (error) throw error;
-        return data;
+    static async update(user_id, updates) {
+        return await prisma.users.update({
+            where: { user_id },
+            data: updates
+        });
     }
 }
 

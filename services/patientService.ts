@@ -1,89 +1,123 @@
-import { supabase } from '../lib/supabase';
-// Patient Service - Mock implementation for frontend
-// In production, this would connect to your backend API
+// Patient Service - API implementation for backend
+// Uses HTTP requests to backend API
+
+const API_BASE_URL = 'http://localhost:5000';
 
 export interface Patient {
-    id: string;
-    name: string;
-    age: number;
-    gender: 'Male' | 'Female' | 'Other';
-    contact: string;
-    email: string;
-    address: string;
+    patient_id: string;
+    full_name: string;
+    age?: number;
+    gender?: string;
+    blood_group?: string;
     abha_id?: string;
-    registration_date: string;
-    last_visit?: string;
-    total_visits: number;
+    phone?: string;
+    address?: string;
+    medical_history?: string;
+    insurance_id?: string;
 }
 
 class PatientService {
-    async getPatients(): Promise<Patient[]> {
-        const { data, error } = await supabase
-            .from('patients')
-            .select('*')
-            .order('name', { ascending: true });
+    private async getAuthHeaders() {
+        const token = localStorage.getItem('auth_token');
+        return {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        };
+    }
 
-        if (error) {
+    async getPatients(): Promise<Patient[]> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/patients`, {
+                headers: await this.getAuthHeaders(),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result.data || [];
+        } catch (error) {
             console.error('Error fetching patients:', error);
             throw error;
         }
-        return data || [];
     }
 
     async getPatientById(id: string): Promise<Patient | null> {
-        const { data, error } = await supabase
-            .from('patients')
-            .select('*')
-            .eq('id', id)
-            .single();
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/patients/${id}`, {
+                headers: await this.getAuthHeaders(),
+            });
 
-        if (error) {
+            if (!response.ok) {
+                if (response.status === 404) return null;
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result.data || null;
+        } catch (error) {
             console.error('Error fetching patient:', error);
             return null;
         }
-        return data;
     }
 
-    async createPatient(patient: Omit<Patient, 'id'>): Promise<Patient> {
-        const { data, error } = await supabase
-            .from('patients')
-            .insert([patient])
-            .select()
-            .single();
+    async createPatient(patient: Patient): Promise<Patient> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/patients`, {
+                method: 'POST',
+                headers: await this.getAuthHeaders(),
+                body: JSON.stringify(patient),
+            });
 
-        if (error) {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result.data;
+        } catch (error) {
             console.error('Error creating patient:', error);
             throw error;
         }
-        return data;
     }
 
     async updatePatient(id: string, updates: Partial<Patient>): Promise<Patient | null> {
-        const { data, error } = await supabase
-            .from('patients')
-            .update(updates)
-            .eq('id', id)
-            .select()
-            .single();
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/patients/${id}`, {
+                method: 'PUT',
+                headers: await this.getAuthHeaders(),
+                body: JSON.stringify(updates),
+            });
 
-        if (error) {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result.data || null;
+        } catch (error) {
             console.error('Error updating patient:', error);
             throw error;
         }
-        return data;
     }
 
     async deletePatient(id: string): Promise<boolean> {
-        const { error } = await supabase
-            .from('patients')
-            .delete()
-            .eq('id', id);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/patients/${id}`, {
+                method: 'DELETE',
+                headers: await this.getAuthHeaders(),
+            });
 
-        if (error) {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return true;
+        } catch (error) {
             console.error('Error deleting patient:', error);
             return false;
         }
-        return true;
     }
 }
 

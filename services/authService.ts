@@ -1,48 +1,61 @@
-import { supabase } from '../lib/supabase';
 import { User, UserRole } from '../App';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export async function getUserWithRole(): Promise<User | null> {
-    // get auth user
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+    const token = localStorage.getItem('auth_token');
+    if (!token) return null;
 
-    // check role from public.users table
-    let { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
 
-    // if no record (likely Google login first time)
-    if (error && error.code === 'PGRST116') {
-        const { data: newUser, error: insertError } = await supabase
-            .from("users")
-            .insert({
-                id: user.id,
-                email: user.email,
-                full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-                role: "patient", // default role
-            })
-            .select()
-            .single();
-
-        if (insertError) {
-            console.error("Error creating user profile:", insertError);
-            return null;
+        if (!response.ok) {
+            if (response.status === 401) {
+                // Token expired, try to get from cache
+                const cachedUser = localStorage.getItem('user');
+                if (cachedUser) {
+                    try {
+                        return JSON.parse(cachedUser);
+                    } catch (parseError) {
+                        console.error('Error parsing cached user:', parseError);
+                    }
+                }
+                localStorage.removeItem('auth_token');
+                return null;
+            }
+            throw new Error('Failed to fetch user');
         }
-        data = newUser;
-    } else if (error) {
-        console.error("Error fetching user profile:", error);
+
+        const data = await response.json();
+        console.log("getUserWithRole raw data:", data);
+        const user = {
+            id: data.data.user_id,
+            name: data.data.full_name,
+            email: data.data.email,
+            role: data.data.role as UserRole,
+        };
+        // Cache the user in localStorage
+        localStorage.setItem('user', JSON.stringify(user));
+        return user;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        // Try to get from cache
+        const cachedUser = localStorage.getItem('user');
+        if (cachedUser) {
+            try {
+                return JSON.parse(cachedUser);
+            } catch (parseError) {
+                console.error('Error parsing cached user:', parseError);
+            }
+        }
+        localStorage.removeItem('auth_token');
         return null;
     }
-
-    return {
-        id: user.id,
-        name: data.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-        email: user.email || '',
-        role: data.role as UserRole,
-        avatar: data.avatar_url || user.user_metadata?.avatar_url,
-    };
 }
 
 export interface ClinicRegistrationData {
@@ -87,13 +100,7 @@ export interface DoctorRegistrationData {
     experience: number;
     specializations: string[];
     languages: string[];
-    clinicName?: string;
-    clinicAddress?: string;
-    inClinicFee?: number;
-    onlineFee?: number;
     consultationModes: string[];
-    conditionsTreated: string[];
-    servicesOffered: string[];
     bankDetails?: {
         accountName: string;
         accountNumber: string;
@@ -101,226 +108,253 @@ export interface DoctorRegistrationData {
         pan: string;
         gstin?: string;
     };
-    bio?: string;
 }
 
-class AuthService {
+export class AuthService {
     // Sign in with email and password
-    async signInWithEmail(email: string, password: string): Promise<User> {
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-
-        if (error) throw error;
-
-        const userWithRole = await getUserWithRole();
-        if (!userWithRole) throw new Error('Failed to fetch user profile');
-
-        return userWithRole;
-    }
-
-    // Sign in with Google OAuth
-    async signInWithGoogle(): Promise<void> {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
+    async signInWithEmail(email: string, password: string) {
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ email, password }),
         });
 
-        if (error) throw error;
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Login failed');
+        }
+
+        const data = await response.json();
+        console.log("signInWithEmail response data:", data);
+        localStorage.setItem('auth_token', data.token);
+
+        return {
+            id: data.user.user_id,
+            name: data.user.full_name,
+            email: data.user.email,
+            role: data.user.role as UserRole,
+        };
     }
 
-    // Sign out
-    async signOut(): Promise<void> {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
+    // Sign in with Google
+    async signInWithGoogle() {
+        window.location.href = `${API_BASE_URL}/api/auth/google`;
     }
 
-    // Sign up a clinic
-    async signUpClinic(data: ClinicRegistrationData, password: string): Promise<void> {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-            email: data.email,
-            password,
-            options: {
-                data: {
-                    full_name: data.name,
-                    role: 'clinic'
-                }
+    // Sign up clinic
+    async signUpClinic(data: ClinicRegistrationData, password: string) {
+        const response = await fetch(`${API_BASE_URL}/api/auth/register/clinic`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ...data, password }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Clinic registration failed');
+        }
+
+        return await response.json();
+    }
+
+    // Sign up doctor
+    async signUpDoctor(data: DoctorRegistrationData, password: string, files?: Record<string, File>) {
+        const formData = new FormData();
+
+        // Add all data fields
+        Object.entries(data).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                formData.append(key, String(value));
             }
         });
 
-        if (authError) throw authError;
-        if (!authData.user) throw new Error('Failed to create auth user');
+        // Add password
+        formData.append('password', password);
 
-        // Insert into public.users
-        const { error: userError } = await supabase.from('users').insert({
-            id: authData.user.id,
-            email: data.email,
-            full_name: data.name,
-            role: 'clinic',
-            phone: data.mobile
+        // Add files if provided
+        if (files) {
+            Object.entries(files).forEach(([key, file]) => {
+                formData.append(key, file);
+            });
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/auth/register/doctor`, {
+            method: 'POST',
+            body: formData,
         });
 
-        if (userError) throw userError;
-
-        // Insert into public.clinics
-        const { data: clinic, error: clinicError } = await supabase.from('clinics').insert({
-            clinic_name: data.name,
-            address: data.address,
-            pin_code: data.pinCode,
-            city: data.city,
-            state: data.state,
-            mobile: data.mobile,
-            email: data.email,
-            medical_council_reg_no: data.medicalCouncilRegNo,
-            establishment_year: data.establishedYear,
-            tagline: data.tagline,
-            description: data.description,
-            website: data.website,
-            bank_account_name: data.bankDetails?.accountName,
-            bank_account_number: data.bankDetails?.accountNumber,
-            ifsc_code: data.bankDetails?.ifsc,
-            pan_number: data.bankDetails?.pan,
-            gstin: data.bankDetails?.gstin,
-            verification_status: 'PENDING'
-        }).select('id').single();
-
-        if (clinicError) throw clinicError;
-
-        // Insert related data
-        if (data.services?.length) {
-            await supabase.from('clinic_services').insert(
-                data.services.map(s => ({ clinic_id: clinic.id, service_type: s }))
-            );
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Doctor registration failed');
         }
-        if (data.facilities?.length) {
-            await supabase.from('clinic_facilities').insert(
-                data.facilities.map(f => ({ clinic_id: clinic.id, facility_name: f }))
-            );
-        }
-        if (data.paymentModes?.length) {
-            await supabase.from('clinic_payment_modes').insert(
-                data.paymentModes.map(m => ({ clinic_id: clinic.id, payment_mode: m }))
-            );
-        }
-    }
 
-    // Sign up a doctor
-    async signUpDoctor(data: DoctorRegistrationData, password: string): Promise<void> {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-            email: data.email,
-            password,
-            options: {
-                data: {
-                    full_name: data.name,
-                    role: 'doctor'
-                }
-            }
-        });
-
-        if (authError) throw authError;
-        if (!authData.user) throw new Error('Failed to create auth user');
-
-        // Insert into public.users
-        const { error: userError } = await supabase.from('users').insert({
-            id: authData.user.id,
-            email: data.email,
-            full_name: data.name,
-            role: 'doctor',
-            phone: data.mobile
-        });
-
-        if (userError) throw userError;
-
-        // Insert into public.doctors
-        const { data: doctor, error: doctorError } = await supabase.from('doctors').insert({
-            full_name: data.name,
-            email: data.email,
-            mobile: data.mobile,
-            date_of_birth: data.dob,
-            medical_council_reg_no: data.mciReg,
-            medical_council_name: data.councilName,
-            registration_year: data.regYear,
-            qualifications: data.degrees,
-            university_name: data.university,
-            graduation_year: data.gradYear,
-            experience_years: data.experience,
-            bio: data.bio,
-            bank_account_name: data.bankDetails?.accountName,
-            bank_account_number: data.bankDetails?.accountNumber,
-            ifsc_code: data.bankDetails?.ifsc,
-            pan_number: data.bankDetails?.pan,
-            gstin: data.bankDetails?.gstin,
-            verification_status: 'PENDING'
-        }).select('id').single();
-
-        if (doctorError) throw doctorError;
-
-        // Insert related data
-        if (data.specializations?.length) {
-            await supabase.from('doctor_specializations').insert(
-                data.specializations.map(s => ({ doctor_id: doctor.id, specialization: s }))
-            );
-        }
-        if (data.languages?.length) {
-            await supabase.from('doctor_languages').insert(
-                data.languages.map(l => ({ doctor_id: doctor.id, language: l }))
-            );
-        }
-        if (data.consultationModes?.length) {
-            await supabase.from('doctor_consultation_modes').insert(
-                data.consultationModes.map(m => ({ doctor_id: doctor.id, mode: m }))
-            );
-        }
+        return await response.json();
     }
 
     // Get current session
     async getSession() {
-        const { data, error } = await supabase.auth.getSession();
-        if (error) throw error;
-        return data.session;
+        const token = localStorage.getItem('auth_token');
+        if (!token) return null;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) return null;
+
+            return await response.json();
+        } catch (error) {
+            return null;
+        }
     }
 
     // Reset password
     async resetPassword(email: string): Promise<void> {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/reset-password`,
+        const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
         });
-        if (error) throw error;
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Password reset failed');
+        }
     }
 
     // Update password
     async updatePassword(newPassword: string): Promise<void> {
-        const { error } = await supabase.auth.updateUser({
-            password: newPassword,
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch(`${API_BASE_URL}/api/auth/update-password`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ password: newPassword }),
         });
-        if (error) throw error;
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Password update failed');
+        }
     }
 
     // Get user profile from database
     async getUserProfile(userId: string) {
-        const { data, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', userId)
-            .single();
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch(`${API_BASE_URL}/api/auth/profile/${userId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
 
-        if (error) throw error;
-        return data;
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch profile');
+        }
+
+        return await response.json();
     }
 
     // Update user profile in database
     async updateUserProfile(userId: string, updates: any) {
-        const { data, error } = await supabase
-            .from('users')
-            .update(updates)
-            .eq('id', userId)
-            .select()
-            .single();
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch(`${API_BASE_URL}/api/auth/profile/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updates),
+        });
 
-        if (error) throw error;
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update profile');
+        }
+
+        return await response.json();
+    }
+
+    // Verify OTP
+    async verifyOtp(email: string, otp: string) {
+        const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, otp }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'OTP verification failed');
+        }
+
+        const data = await response.json();
+        localStorage.setItem('auth_token', data.token);
+
+        return {
+            id: data.user.user_id,
+            name: data.user.full_name,
+            email: data.user.email,
+            role: data.user.role,
+        };
+    }
+
+    // Sign out
+    async signOut() {
+        localStorage.removeItem('auth_token');
+    }
+
+    // Clinic registration
+    async signUpClinic(clinicData: any, password: string) {
+        const response = await fetch(`${API_BASE_URL}/api/auth/register/clinic`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ...clinicData, password }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Clinic registration failed');
+        }
+
+        const data = await response.json();
+        return data;
+    }
+
+    // OTP verification
+    async verifyOtp(email: string, otp: string) {
+        const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, otp }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'OTP verification failed');
+        }
+
+        const data = await response.json();
+        // Store token
+        localStorage.setItem('auth_token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         return data;
     }
 }

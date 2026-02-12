@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from '../../lib/api';
 import {
   Calendar,
   Video,
@@ -28,69 +29,58 @@ interface MyAppointmentsProps {
   patient: PatientUser;
 }
 
-const appointments = [
-  {
-    id: 'APT-001',
-    date: 'Nov 15, 2025',
-    time: '10:00 AM',
-    doctor: 'Dr. Sarah Johnson',
-    avatar: 'SJ',
-    specialty: 'Cardiologist',
-    clinic: 'Heart Care Center',
-    type: 'video',
-    status: 'scheduled',
-    canJoin: true
-  },
-  {
-    id: 'APT-002',
-    date: 'Nov 20, 2025',
-    time: '2:30 PM',
-    doctor: 'Dr. Rajesh Kumar',
-    avatar: 'RK',
-    specialty: 'General Physician',
-    clinic: 'City Medical Center',
-    type: 'in-clinic',
-    status: 'scheduled',
-    canJoin: false
-  },
-  {
-    id: 'APT-003',
-    date: 'Nov 08, 2025',
-    time: '11:00 AM',
-    doctor: 'Dr. Priya Sharma',
-    avatar: 'PS',
-    specialty: 'Dermatologist',
-    clinic: 'Skin Clinic',
-    type: 'video',
-    status: 'completed',
-    canJoin: false
-  },
-  {
-    id: 'APT-004',
-    date: 'Oct 25, 2025',
-    time: '9:00 AM',
-    doctor: 'Dr. Michael Chen',
-    avatar: 'MC',
-    specialty: 'Orthopedic',
-    clinic: 'Bone & Joint Hospital',
-    type: 'in-clinic',
-    status: 'cancelled',
-    canJoin: false
-  }
-];
+interface Appointment {
+  appointment_id: string;
+  appointment_date: string;
+  appointment_time: string;
+  type: string;
+  mode: string;
+  status: string;
+  doctor: {
+    full_name: string;
+    qualifications: string;
+  };
+  clinic?: {
+    clinic_name: string;
+  };
+}
 
 export function MyAppointments({ patient }: MyAppointmentsProps) {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        setLoading(true);
+        const data = await api.get(`/appointments/patient/${patient.id}`);
+        console.log('API RESPONSE:', data);
+        setAppointments(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Error fetching appointments:', err);
+        setError('Failed to load appointments');
+        setAppointments([]); // Ensure appointments is always an array
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (patient.id) {
+      fetchAppointments();
+    }
+  }, [patient.id]);
+
   const filteredAppointments = appointments.filter(apt => {
-    const matchesSearch = 
-      apt.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      apt.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      apt.clinic.toLowerCase().includes(searchQuery.toLowerCase());
-    
+    const matchesSearch =
+      apt.doctor.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      apt.doctor.qualifications?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      apt.clinic?.clinic_name?.toLowerCase().includes(searchQuery.toLowerCase());
+
     const matchesStatus = statusFilter === 'all' || apt.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -203,80 +193,100 @@ export function MyAppointments({ patient }: MyAppointmentsProps) {
                 </tr>
               </thead>
               <tbody>
-                {filteredAppointments.map((apt, index) => (
-                  <tr 
-                    key={apt.id} 
-                    className={`border-b border-gray-100 hover:bg-pink-50 transition-colors ${
-                      index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                    }`}
-                  >
-                    <td className="p-4">
-                      <div>
-                        <p className="font-medium text-gray-900">{apt.date}</p>
-                        <p className="text-sm text-gray-600">{apt.time}</p>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="size-10">
-                          <AvatarFallback className="bg-pink-600 text-white">
-                            {apt.avatar}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-gray-900">{apt.doctor}</p>
-                          <p className="text-sm text-gray-600">{apt.clinic}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <p className="text-gray-900">{apt.specialty}</p>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        {apt.type === 'video' ? (
-                          <>
-                            <Video className="size-4 text-blue-600" />
-                            <span className="text-sm text-gray-900">Video Consultation</span>
-                          </>
-                        ) : (
-                          <>
-                            <Building2 className="size-4 text-green-600" />
-                            <span className="text-sm text-gray-900">In-Clinic</span>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      {getStatusBadge(apt.status)}
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        {apt.canJoin && apt.status === 'scheduled' && apt.type === 'video' && (
-                          <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                            <Video className="size-4 mr-1" />
-                            Join Call
-                          </Button>
-                        )}
-                        {apt.status === 'completed' && (
-                          <Button size="sm" variant="outline">
-                            <Download className="size-4 mr-1" />
-                            Report
-                          </Button>
-                        )}
-                        {apt.status === 'scheduled' && !apt.canJoin && (
-                          <Button size="sm" variant="outline">
-                            <Calendar className="size-4 mr-1" />
-                            Reschedule
-                          </Button>
-                        )}
-                        <Button size="sm" variant="ghost">
-                          <MoreHorizontal className="size-4" />
-                        </Button>
-                      </div>
+                {filteredAppointments.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-gray-500">
+                      No appointments found matching your criteria.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredAppointments.map((apt, index) => {
+                    const appointmentDate = new Date(apt.appointment_date);
+                    const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    });
+                    const formattedTime = apt.appointment_time || 'TBD';
+                    const doctorInitials = apt.doctor.full_name.split(' ').map(n => n[0]).join('').toUpperCase();
+                    const canJoin = apt.status === 'scheduled' && apt.mode === 'video';
+
+                    return (
+                      <tr
+                        key={apt.appointment_id}
+                        className={`border-b border-gray-100 hover:bg-pink-50 transition-colors ${
+                          index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                        }`}
+                      >
+                        <td className="p-4">
+                          <div>
+                            <p className="font-medium text-gray-900">{formattedDate}</p>
+                            <p className="text-sm text-gray-600">{formattedTime}</p>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="size-10">
+                              <AvatarFallback className="bg-pink-600 text-white">
+                                {doctorInitials}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium text-gray-900">{apt.doctor.full_name}</p>
+                              <p className="text-sm text-gray-600">{apt.clinic?.clinic_name || 'Clinic'}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <p className="text-gray-900">{apt.doctor.qualifications || 'General Medicine'}</p>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            {apt.mode === 'video' ? (
+                              <>
+                                <Video className="size-4 text-blue-600" />
+                                <span className="text-sm text-gray-900">Video Consultation</span>
+                              </>
+                            ) : (
+                              <>
+                                <Building2 className="size-4 text-green-600" />
+                                <span className="text-sm text-gray-900">In-Clinic</span>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          {getStatusBadge(apt.status)}
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            {canJoin && (
+                              <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                                <Video className="size-4 mr-1" />
+                                Join Call
+                              </Button>
+                            )}
+                            {apt.status === 'completed' && (
+                              <Button size="sm" variant="outline">
+                                <Download className="size-4 mr-1" />
+                                Report
+                              </Button>
+                            )}
+                            {apt.status === 'scheduled' && !canJoin && (
+                              <Button size="sm" variant="outline">
+                                <Calendar className="size-4 mr-1" />
+                                Reschedule
+                              </Button>
+                            )}
+                            <Button size="sm" variant="ghost">
+                              <MoreHorizontal className="size-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>

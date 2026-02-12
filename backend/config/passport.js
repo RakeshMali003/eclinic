@@ -1,6 +1,7 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const supabase = require('./supabase');
+const prisma = require('./database');
+const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 
 passport.use(
@@ -14,59 +15,23 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Search by google_id
-        let { data: users, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('google_id', profile.id);
+        const email = profile.emails[0].value;
 
-        if (error) throw error;
+        // First, try to find user by email
+        let user = await prisma.users.findUnique({
+          where: { email: email }
+        });
 
-        let user;
-
-        if (!users || users.length === 0) {
-          // Search by email
-          const email = profile.emails[0].value;
-          let { data: existingUsers, error: emailError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email);
-
-          if (emailError) throw emailError;
-
-          if (!existingUsers || existingUsers.length === 0) {
-            // Create new user with manual ID
-            const { data: newUser, error: insertError } = await supabase
-              .from('users')
-              .insert([
-                {
-                  id: uuidv4(),
-                  full_name: profile.displayName,
-                  email: email,
-                  google_id: profile.id,
-                  role: 'PATIENT',
-                  created_at: new Date().toISOString()
-                }
-              ])
-              .select()
-              .single();
-
-            if (insertError) throw insertError;
-            user = newUser;
-          } else {
-            // Update existing user with google_id
-            const { data: updatedUser, error: updateError } = await supabase
-              .from('users')
-              .update({ google_id: profile.id })
-              .eq('id', existingUsers[0].id)
-              .select()
-              .single();
-
-            if (updateError) throw updateError;
-            user = updatedUser;
-          }
-        } else {
-          user = users[0];
+        if (!user) {
+          // Create new user
+          user = await prisma.users.create({
+            data: {
+              full_name: profile.displayName,
+              email: email,
+              password_hash: await bcrypt.hash(Math.random().toString(36), 10), // temporary password
+              role: 'patient'
+            }
+          });
         }
 
         return done(null, user);
@@ -79,18 +44,16 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, user.user_id);
 });
 
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(async (userId, done) => {
   try {
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const user = await prisma.users.findUnique({
+      where: { user_id: userId }
+    });
 
-    if (error) throw error;
+    if (!user) throw new Error('User not found');
     done(null, user);
   } catch (error) {
     done(error, null);

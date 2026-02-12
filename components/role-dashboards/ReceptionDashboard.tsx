@@ -1,5 +1,10 @@
 import { Dashboard } from "../Dashboard";
+import { User } from "../../App";
 
-export function ReceptionDashboard() {
-    return <Dashboard userRole="reception" />;
+interface ReceptionDashboardProps {
+  user: User;
+}
+
+export function ReceptionDashboard({ user }: ReceptionDashboardProps) {
+  return <Dashboard user={user} />;
 }

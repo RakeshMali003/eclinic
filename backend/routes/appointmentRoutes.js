@@ -11,7 +11,6 @@ router.use(protect);
 router.post(
     '/',
     [
-        check('appointment_id', 'ID is required').not().isEmpty(),
         check('patient_id', 'Patient ID is required').not().isEmpty(),
         check('doctor_id', 'Doctor ID is required').not().isEmpty(),
         check('appointment_date', 'Date is required').not().isEmpty(),
@@ -21,6 +20,9 @@ router.post(
 );
 
 router.get('/', appointmentController.getAllAppointments);
+router.get('/patient/:patientId', appointmentController.getAppointmentsByPatient);
+router.get('/upcoming/:patientId', appointmentController.getUpcomingAppointments);
+router.get('/booked-slots/:doctorId/:date', appointmentController.getBookedSlots);
 router.get('/:id', appointmentController.getAppointmentById);
 
 router.patch(

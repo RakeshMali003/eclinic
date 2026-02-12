@@ -1,5 +1,10 @@
 import { Dashboard } from "../Dashboard";
+import { User } from "../../App";
 
-export function LabDashboard() {
-    return <Dashboard userRole="lab" />;
+interface LabDashboardProps {
+  user: User;
+}
+
+export function LabDashboard({ user }: LabDashboardProps) {
+  return <Dashboard user={user} />;
 }

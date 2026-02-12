@@ -1,5 +1,5 @@
 import { cn } from "./utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface Particle {
   id: number;
@@ -17,13 +17,13 @@ interface ParticleBackgroundProps {
   colors?: string[];
 }
 
-export function ParticleBackground({ 
-  className, 
+export function ParticleBackground({
+  className,
   particleCount = 50,
   colors = ["#ec4899", "#a855f7", "#3b82f6", "#10b981"]
 }: ParticleBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [particles, setParticles] = useState<Particle[]>([]);
+  const particlesRef = useRef<Particle[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -53,13 +53,13 @@ export function ParticleBackground({
         opacity: Math.random() * 0.5 + 0.2
       });
     }
-    setParticles(newParticles);
+    particlesRef.current = newParticles;
 
     let animationId: number;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      newParticles.forEach((particle) => {
+      particlesRef.current.forEach((particle) => {
         // Update position
         particle.x += particle.speedX;
         particle.y += particle.speedY;
@@ -78,13 +78,13 @@ export function ParticleBackground({
       });
 
       // Draw connections
-      newParticles.forEach((particle1, i) => {
-        newParticles.slice(i + 1).forEach((particle2) => {
+      particlesRef.current.forEach((particle1, i) => {
+        particlesRef.current.slice(i + 1).forEach((particle2) => {
           const distance = Math.sqrt(
-            Math.pow(particle1.x - particle2.x, 2) + 
+            Math.pow(particle1.x - particle2.x, 2) +
             Math.pow(particle1.y - particle2.y, 2)
           );
-          
+
           if (distance < 100) {
             ctx.beginPath();
             ctx.moveTo(particle1.x, particle1.y);
