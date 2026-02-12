@@ -10,7 +10,27 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 const passport = require('./config/passport');
 
 const errorHandler = require('./middleware/errorHandler');
+<<<<<<< HEAD
 const prisma = require('./config/database');
+=======
+const pool = require('./config/database');
+const supabase = require('./config/supabase');
+
+const checkSupabaseConnection = async () => {
+    try {
+        const { data, error } = await supabase.from('users').select('count', { count: 'exact', head: true });
+        if (error) {
+            console.error('❌ Supabase connection failed:', error.message);
+        } else {
+            console.log('✅ Supabase connection successful');
+        }
+    } catch (err) {
+        console.error('❌ Supabase connection error:', err.message);
+    }
+};
+
+checkSupabaseConnection();
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
 
 // Import routes (Will be created next)
 // const clinicRoutes = require('./routes/clinicRoutes');
@@ -21,7 +41,18 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const userRoutes = require('./routes/userRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
+const logger = require('./utils/logger');
 const app = express();
+
+// Custom request logger
+app.use((req, res, next) => {
+    logger.info('API_REQUEST', `${req.method} ${req.originalUrl}`, {
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+        user: req.user ? req.user.id : 'unauthenticated'
+    });
+    next();
+});
 
 // Middleware
 app.use(helmet());
@@ -50,9 +81,11 @@ app.use(passport.session());
 // Static files
 app.use('/uploads', express.static('uploads'));
 
+const ResponseHandler = require('./utils/responseHandler');
+
 // Health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'OK', message: 'Anti-Gravity Healthcare API is operational in orbit' });
+    ResponseHandler.success(res, { status: 'OK' }, 'Anti-Gravity Healthcare API is operational in orbit');
 });
 
 // API Routes (Commented until implemented to prevent crash)

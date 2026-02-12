@@ -1,8 +1,10 @@
 const Appointment = require('../models/appointmentModel');
 const ResponseHandler = require('../utils/responseHandler');
+const logger = require('../utils/logger');
 
 exports.createAppointment = async (req, res, next) => {
     try {
+<<<<<<< HEAD
         const { patient_id, doctor_id, appointment_date } = req.body;
 
         if (!patient_id || !doctor_id || !appointment_date) {
@@ -34,7 +36,21 @@ exports.createAppointment = async (req, res, next) => {
 
         const newAppointment = await Appointment.create(appointmentData);
         ResponseHandler.created(res, newAppointment, 'Appointment created successfully');
+=======
+        logger.info('APPOINTMENT_CREATE_START', 'Initiating appointment creation', { data: req.body });
+        const { appointment_id, patient_id, doctor_id, appointment_date } = req.body;
+
+        if (!appointment_id || !patient_id || !doctor_id || !appointment_date) {
+            logger.warn('APPOINTMENT_CREATE_BAD_REQUEST', 'Missing flight parameters');
+            return ResponseHandler.badRequest(res, 'Missing flight parameters for rendezvous');
+        }
+
+        const newAppointment = await Appointment.create(req.body);
+        logger.success('APPOINTMENT_CREATE_SUCCESS', 'Appointment created', { appointment_id });
+        ResponseHandler.created(res, newAppointment, 'Rendezvous confirmed');
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
     } catch (error) {
+        logger.error('APPOINTMENT_CREATE_FAIL', 'Failed to create appointment', { error: error.message });
         next(error);
     }
 };

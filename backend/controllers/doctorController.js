@@ -1,5 +1,7 @@
 const Doctor = require('../models/doctorModel');
 const ResponseHandler = require('../utils/responseHandler');
+const logger = require('../utils/logger');
+const { syncUserToAuth } = require('../utils/userSync');
 
 exports.registerDoctor = async (req, res, next) => {
     try {
@@ -72,14 +74,20 @@ exports.registerDoctor = async (req, res, next) => {
 
 exports.createDoctor = async (req, res, next) => {
     try {
+        logger.info('DOCTOR_CREATE_START', 'Initiating doctor creation', { data: req.body });
+
         // Basic validation handled by middleware, robust checks here
         const { full_name, email, mobile, medical_council_reg_no } = req.body;
 
-        // Could check duplicates here
-
         const newDoctor = await Doctor.create(req.body);
+
+        // Sync to auth_users
+        await syncUserToAuth(email, 'doctor', mobile);
+
+        logger.success('DOCTOR_CREATE_SUCCESS', 'Doctor created and synced', { doctor_id: newDoctor.id, email });
         ResponseHandler.created(res, newDoctor, 'Medical officer commissioned successfully');
     } catch (error) {
+        logger.error('DOCTOR_CREATE_FAIL', 'Failed to create doctor', { error: error.message });
         next(error);
     }
 };

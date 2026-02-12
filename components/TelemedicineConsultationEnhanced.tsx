@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Heart, Video, VideoOff, Mic, MicOff, Phone, MessageSquare, FileText, Upload, Monitor, MonitorOff, Clock, User, Settings, X, Send, Paperclip, Activity } from 'lucide-react';
+import { Heart, Video, VideoOff, Mic, MicOff, Phone, MessageSquare, FileText, Upload, Monitor, MonitorOff, Clock, User, Settings, X, Send, Paperclip, Activity, Home } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { toast } from 'sonner';
 
 interface TelemedicineConsultationEnhancedProps {
-  onClose: () => void;
+  onNavigate: (view: string) => void;
   appointmentId?: number;
 }
 
-export function TelemedicineConsultationEnhanced({ onClose, appointmentId }: TelemedicineConsultationEnhancedProps) {
+export function TelemedicineConsultationEnhanced({ onNavigate, appointmentId }: TelemedicineConsultationEnhancedProps) {
   const [callStatus, setCallStatus] = useState<'waiting' | 'connecting' | 'active' | 'ended'>('waiting');
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -91,7 +91,14 @@ export function TelemedicineConsultationEnhanced({ onClose, appointmentId }: Tel
       {callStatus === 'waiting' && (
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="max-w-2xl w-full">
-            <div className="bg-white rounded-3xl shadow-2xl p-8">
+            <div className="bg-white rounded-3xl shadow-2xl p-8 relative">
+              <button
+                onClick={() => onNavigate('home')}
+                className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-all"
+                title="Go to Home"
+              >
+                <Home className="w-5 h-5 text-gray-600" />
+              </button>
               <div className="text-center mb-8">
                 <div className="inline-block bg-gradient-to-r from-pink-600 to-purple-600 p-4 rounded-2xl mb-4">
                   <Video className="w-16 h-16 text-white" />
@@ -420,7 +427,7 @@ export function TelemedicineConsultationEnhanced({ onClose, appointmentId }: Tel
                 </Button>
               </div>
 
-              <Button onClick={onClose} variant="ghost" className="w-full">
+              <Button onClick={() => onNavigate('home')} variant="ghost" className="w-full">
                 Close
               </Button>
 

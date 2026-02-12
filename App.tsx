@@ -22,6 +22,7 @@ import { Contact } from "./components/Contact";
 // Registration Components
 import { ClinicRegistration } from "./components/ClinicRegistration";
 import { DoctorRegistration } from "./components/DoctorRegistration";
+import { PatientRegistration } from "./components/PatientRegistration";
 
 // Patient Portal Components
 import { PatientPortal } from "./components/PatientPortal";
@@ -92,15 +93,35 @@ export interface User {
   email: string;
   role: UserRole;
   avatar?: string;
+  clinicId?: string | number; // Added for multi-tenancy
+  phone?: string;
 }
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<PageView>("home");
+  const [currentView, setCurrentView] = useState<PageView>(() => {
+    // Initialize from localStorage
+    if (typeof window !== 'undefined') {
+      const savedView = localStorage.getItem('currentView');
+      // Validate if savedView is a valid PageView (simplified check)
+      if (savedView && savedView !== 'loading') {
+        return savedView as PageView;
+      }
+    }
+    return "home";
+  });
   const [user, setUser] = useState<User | null>(null);
+
+  // Persist currentView to localStorage
+  useEffect(() => {
+    if (currentView && currentView !== 'loading') {
+      localStorage.setItem('currentView', currentView);
+    }
+  }, [currentView]);
 
   useEffect(() => {
     const initAuth = async () => {
       try {
+<<<<<<< HEAD
         // Check for auth callback parameters
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
@@ -114,6 +135,18 @@ export default function App() {
           const validRoles = ['patient', 'doctor', 'clinic', 'receptionist', 'nurse', 'lab', 'pharmacy', 'admin'];
           if (!validRoles.includes(userData.role)) {
             userData.role = 'patient';
+=======
+        const userWithRole = await getUserWithRole();
+        if (userWithRole) {
+          setUser(userWithRole);
+          // Only redirect to dashboard if we are at home or login, otherwise respect persisted view
+          if (currentView === "home" || currentView === "login" || currentView.startsWith("register-")) {
+            setCurrentView("dashboard");
+          }
+
+          if (window.location.pathname === "/auth/callback") {
+            window.history.replaceState({}, document.title, "/");
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
           }
           const user = {
             id: userData.user_id,
@@ -155,6 +188,7 @@ export default function App() {
           // Clear URL parameters
           window.history.replaceState({}, document.title, "/");
         } else {
+<<<<<<< HEAD
           // Check for existing session
           const userWithRole = await getUserWithRole();
           if (userWithRole) {
@@ -195,6 +229,24 @@ export default function App() {
             }
           } else {
             setCurrentView("home");
+=======
+          // If no user, but we have a persisted view that REQUIRES auth, we should probably go home/login
+          // For now, let's just respect the persisted view unless it's strictly a protected dashboard
+          // But since simple persistence is dumb, let's just let it be.
+
+          if (window.location.pathname !== "/auth/callback") {
+            // Do not force home if we have a saved view, unless we want to enforce auth
+            // But for non-protected pages (features, pricing etc), staying on them is good.
+          } else {
+            setCurrentView("loading");
+            setTimeout(() => {
+              if (window.location.pathname === "/auth/callback" && !user) {
+                console.log("Auth callback timeout - redirecting home");
+                setCurrentView("home");
+                window.history.replaceState({}, document.title, "/");
+              }
+            }, 5000);
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
           }
         }
       } catch (error) {
@@ -204,7 +256,34 @@ export default function App() {
     };
 
     initAuth();
+<<<<<<< HEAD
   }, []);
+=======
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, _session) => {
+      console.log("Auth event:", event);
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        const userWithRole = await getUserWithRole();
+        if (userWithRole) {
+          setUser(userWithRole);
+          // If just signing in, go to dashboard
+          if (currentView === "home" || currentView === "login" || currentView.startsWith("register-")) {
+            setCurrentView("dashboard");
+          }
+          if (window.location.pathname === "/auth/callback") {
+            window.history.replaceState({}, document.title, "/");
+          }
+        }
+      } else if (event === "SIGNED_OUT") {
+        setUser(null);
+        setCurrentView("home");
+        localStorage.removeItem('currentView'); // Clear saved view on logout
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []); // Remove dependency on empty array to run once, but we need refs inside... actually empty array is fine.
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
 
   const handleLogin = (userData: User) => {
     console.log("handleLogin called with:", userData);
@@ -266,9 +345,7 @@ export default function App() {
     } else if (role === "doctor") {
       setCurrentView("register-doctor");
     } else {
-      // For patient, can use a simpler form or direct to login
-      alert("Patient registration will use quick signup with mobile OTP");
-      setCurrentView("login");
+      setCurrentView("register-patient");
     }
   };
 
@@ -286,13 +363,16 @@ export default function App() {
       return <Login onLogin={handleLogin} onBack={() => setCurrentView("home")} onRegister={handleRegister} />;
     }
 
-    // Registration Views
     if (currentView === "register-clinic") {
-      return <ClinicRegistration onComplete={handleRegistrationComplete} onBack={() => setCurrentView("login")} />;
+      return <ClinicRegistration onBack={() => setCurrentView("login")} />;
     }
 
     if (currentView === "register-doctor") {
-      return <DoctorRegistration onComplete={handleRegistrationComplete} onBack={() => setCurrentView("login")} />;
+      return <DoctorRegistration onBack={() => setCurrentView("login")} />;
+    }
+
+    if (currentView === "register-patient") {
+      return <PatientRegistration onBack={() => setCurrentView("login")} />;
     }
 
     // Core Service Pages
@@ -350,7 +430,8 @@ export default function App() {
       return <Contact onNavigate={navigateTo} />;
     }
 
-    // Patient Portal Views
+    // Patient Portal Views - Commented out due to missing component imports
+    /*
     if (currentView === "patient-book-appointment") {
       return <BookAppointment user={user} onBack={() => setCurrentView("dashboard")} />;
     }
@@ -386,8 +467,10 @@ export default function App() {
     if (currentView === "patient-ai-tools") {
       return <AIHealthTools user={user} onBack={() => setCurrentView("dashboard")} />;
     }
+    */
 
-    // Clinic Management Views
+    // Clinic Management Views - Commented out due to missing component imports
+    /*
     if (currentView === "clinic-appointments") {
       return <AppointmentManagement user={user} onBack={() => setCurrentView("dashboard")} />;
     }
@@ -451,6 +534,7 @@ export default function App() {
     if (currentView === "clinic-profile") {
       return <ClinicProfile user={user} onBack={() => setCurrentView("dashboard")} />;
     }
+    */
 
     if (currentView === "loading") {
       return (
@@ -502,7 +586,11 @@ export default function App() {
           return <DoctorDashboard user={user} />;
         case "clinic":
           return <ClinicDashboard user={user} />;
+<<<<<<< HEAD
         case "receptionist":
+=======
+        case "reception":
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
           return <ReceptionDashboard user={user} />;
         case "nurse":
           return <NurseDashboard user={user} />;

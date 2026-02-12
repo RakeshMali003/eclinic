@@ -1,7 +1,15 @@
 const ResponseHandler = require('../utils/responseHandler');
+const logger = require('../utils/logger');
 
 const errorHandler = (err, req, res, next) => {
-    console.error('Error:', err);
+    // Log the error with request context
+    logger.error('SERVER_ERROR', err.message || 'Internal system failure', {
+        method: req.method,
+        path: req.originalUrl,
+        user: req.user ? req.user.id : 'unauthenticated',
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+        error_details: err
+    });
 
     // PostgreSQL errors
     if (err.code === '23505') {

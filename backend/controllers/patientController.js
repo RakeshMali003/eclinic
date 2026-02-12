@@ -1,24 +1,37 @@
 const Patient = require('../models/patientModel');
 const ResponseHandler = require('../utils/responseHandler');
+const logger = require('../utils/logger');
+const { syncUserToAuth } = require('../utils/userSync');
 
 exports.createPatient = async (req, res, next) => {
     try {
-        const { patient_id, full_name, age, gender, phone } = req.body;
+        logger.info('PATIENT_CREATE_START', 'Initiating patient creation', { data: req.body });
+        const { patient_id, full_name, age, gender, phone, email } = req.body;
 
         // Validation
         if (!patient_id || !full_name || !phone) {
+            logger.warn('PATIENT_CREATE_BAD_REQUEST', 'Missing essential bio-data');
             return ResponseHandler.badRequest(res, 'Missing essential bio-data (ID, Name, Phone)');
         }
 
         // Check existing
         const existing = await Patient.findById(patient_id);
         if (existing) {
+            logger.warn('PATIENT_CREATE_CONFLICT', 'Patient ID already exists', { patient_id });
             return ResponseHandler.badRequest(res, 'Patient identity integrity violation: ID already exists');
         }
 
         const newPatient = await Patient.create(req.body);
+
+        // Sync to auth_users if email is provided
+        if (email) {
+            await syncUserToAuth(email, 'patient', phone);
+        }
+
+        logger.success('PATIENT_CREATE_SUCCESS', 'Patient created and synced', { patient_id, email });
         ResponseHandler.created(res, newPatient, 'Patient lifecycle initiated');
     } catch (error) {
+        logger.error('PATIENT_CREATE_FAIL', 'Failed to create patient', { error: error.message });
         next(error);
     }
 };

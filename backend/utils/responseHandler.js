@@ -1,5 +1,8 @@
+const logger = require('./logger');
+
 class ResponseHandler {
     static success(res, data, message = 'Operation successful in zero-g', statusCode = 200) {
+        logger.success('API_RESPONSE', message, { path: res.req.originalUrl, method: res.req.method, status: statusCode });
         return res.status(statusCode).json({
             success: true,
             message,
@@ -9,6 +12,7 @@ class ResponseHandler {
     }
 
     static error(res, message = 'Gravity anomaly detected', statusCode = 500, errors = null) {
+        logger.error('API_ERROR', message, { path: res.req.originalUrl, method: res.req.method, status: statusCode, errors });
         return res.status(statusCode).json({
             success: false,
             message,
