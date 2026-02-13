@@ -14,7 +14,7 @@ export function PatientHeader({ patient, onLogout }: PatientHeaderProps) {
     <header className="bg-white border-b border-pink-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-semibold text-gray-900">Welcome back, {patient.name ? patient.name.split(' ')[0] : 'User'}!</h1>
+          <h1 className="font-semibold text-gray-900">Welcome back, {patient.name.split(' ')[0]}!</h1>
           <p className="text-sm text-gray-600">Manage your health, anytime, anywhere</p>
         </div>
         

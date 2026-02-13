@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const prisma = require('../config/database');
+const pool = require('../config/database');
 const ResponseHandler = require('../utils/responseHandler');
 
 const protect = async (req, res, next) => {
@@ -18,24 +18,17 @@ const protect = async (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // Use prisma to find user
-        const user = await prisma.users.findUnique({
-            where: {
-                user_id: decoded.id
-            },
-            select: {
-                user_id: true,
-                full_name: true,
-                email: true,
-                role: true
-            }
-        });
+        // Adapted query to use 'id' instead of 'user_id' if that's the standard, checking schema later
+        const result = await pool.query(
+            'SELECT user_id, full_name, email, role FROM users WHERE user_id = $1',
+            [decoded.id]
+        );
 
-        if (!user) {
+        if (result.rows.length === 0) {
             return ResponseHandler.unauthorized(res, 'User signature not found in registry');
         }
 
-        req.user = user;
+        req.user = result.rows[0];
         next();
     } catch (error) {
         return ResponseHandler.unauthorized(res, 'Not authorized: Signal lost');

@@ -146,11 +146,11 @@ export function generateABHAID(): string {
 
 /**
  * Generate appointment ID
- * Format: APT-YYMMDD-HHMM-XXXX
+ * Format: APT-YYYYMMDD-HHMM-XXXX
  */
 export function generateAppointmentID(): string {
   const now = new Date();
-  const year = now.getFullYear().toString().slice(-2);
+  const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
   const hours = String(now.getHours()).padStart(2, '0');

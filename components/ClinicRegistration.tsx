@@ -214,62 +214,6 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-<<<<<<< HEAD
-  const validateAllRequiredFields = () => {
-    const errors: Record<string, string> = {};
-
-    // Required field checks
-    if (!formData.clinicName) errors.clinicName = "Clinic Name is required";
-    else if (formData.clinicName.length > 150) errors.clinicName = "Clinic Name must be less than 150 characters";
-
-    if (!formData.clinicType) errors.clinicType = "Clinic Type is required";
-
-    if (!formData.establishedYear) errors.establishedYear = "Established Year is required";
-
-    if (!formData.description) errors.description = "Description is required";
-    else if (formData.description.length > 500) errors.description = "Description must be less than 500 characters";
-
-    if (!formData.password) errors.password = "Password is required";
-
-    if (!formData.address) errors.address = "Address is required";
-
-    if (!formData.pinCode) errors.pinCode = "PIN Code is required";
-    else if (formData.pinCode.length !== 6) errors.pinCode = "PIN Code must be exactly 6 digits";
-
-    if (!formData.city) errors.city = "City is required";
-    else if (formData.city.length > 100) errors.city = "City must be less than 100 characters";
-
-    if (!formData.state) errors.state = "State is required";
-    else if (formData.state.length > 100) errors.state = "State must be less than 100 characters";
-
-    if (!formData.mobile) errors.mobile = "Contact Number is required";
-    else if (formData.mobile.length !== 10) errors.mobile = "Mobile Number must be exactly 10 digits";
-
-    if (!formData.email) errors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Invalid email format";
-    else if (formData.email.length > 150) errors.email = "Email must be less than 150 characters";
-
-    if (!formData.medicalCouncilRegNo) errors.medicalCouncilRegNo = "Medical Council Reg No is required";
-    else if (formData.medicalCouncilRegNo.length > 100) errors.medicalCouncilRegNo = "Medical Council Reg No must be less than 100 characters";
-
-    // Optional field length checks
-    if (formData.tagline && formData.tagline.length > 200) errors.tagline = "Tagline must be less than 200 characters";
-    if (formData.website && formData.website.length > 200) errors.website = "Website must be less than 200 characters";
-
-    // Bank details length checks
-    if (formData.accountName && formData.accountName.length > 150) errors.accountName = "Account Holder Name must be less than 150 characters";
-    if (formData.accountNumber && formData.accountNumber.length > 50) errors.accountNumber = "Account Number must be less than 50 characters";
-    if (formData.ifsc && formData.ifsc.length > 20) errors.ifsc = "IFSC Code must be less than 20 characters";
-    if (formData.pan && formData.pan.length !== 10) errors.pan = "PAN Number must be exactly 10 characters";
-    if (formData.gstin && formData.gstin.length !== 15) errors.gstin = "GSTIN must be exactly 15 characters";
-
-    if (Object.keys(errors).length > 0) {
-      setErrors(errors);
-      toast.error("Please fill in all required fields correctly and ensure field lengths are within limits.");
-      return false;
-    }
-    return true;
-=======
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       const target = e.target as HTMLElement;
@@ -288,12 +232,9 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
         handleSubmit(); // If on the last step, submit the form
       }
     }
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
   };
 
   const handleSubmit = async () => {
-    if (!validateAllRequiredFields()) return;
-
     try {
       setLoading(true);
       await authService.signUpClinic({
@@ -324,9 +265,6 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
       }, formData.password, files);
 
       toast.success('Registration successful!');
-<<<<<<< HEAD
-      onBack();
-=======
 
       // Check if logged in (auto-confirm or no email verification needed)
       const session = await authService.getSession();
@@ -337,29 +275,9 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
         toast.info("Please check your email for verification.");
         onBack();
       }
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
     } catch (error: any) {
       console.error('Registration error:', error);
       toast.error(error.message || 'Failed to register clinic');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (!otp) {
-      toast.error('Please enter OTP');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await authService.verifyOtp(formData.email, otp);
-      toast.success('Email verified successfully! Registration complete.');
-      onBack();
-    } catch (error: any) {
-      console.error('OTP verification error:', error);
-      toast.error(error.message || 'Failed to verify OTP');
     } finally {
       setLoading(false);
     }
@@ -395,8 +313,6 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div>
-<<<<<<< HEAD
-=======
         <Button
           type="button"
           onClick={() => authService.signInWithGoogle('clinic')}
@@ -421,7 +337,6 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
           </div>
         </div>
 
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
         <Label htmlFor="clinicName">Clinic / Hospital Name *</Label>
         <p className="text-xs text-gray-600 mt-1">As per registration certificate</p>
         <Input
@@ -454,16 +369,6 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
 
         <div>
           <Label htmlFor="establishedYear">Established Year *</Label>
-<<<<<<< HEAD
-          <Input
-            id="establishedYear"
-            placeholder="e.g., 2010"
-            type="number"
-            className={`mt-2 ${errors.establishedYear ? 'border-red-500' : ''}`}
-            value={formData.establishedYear}
-            onChange={handleInputChange}
-          />
-=======
           <Select onValueChange={(v) => handleSelectChange('establishedYear', v)} value={formData.establishedYear}>
             <SelectTrigger id="establishedYear" className={`mt-2 ${errors.establishedYear ? 'border-red-500' : ''}`}>
               <SelectValue placeholder="Select Year" />
@@ -476,7 +381,6 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
               ))}
             </SelectContent>
           </Select>
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
           {errors.establishedYear && <p className="text-xs text-red-500 mt-1">{errors.establishedYear}</p>}
         </div>
       </div>
@@ -492,11 +396,7 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
         />
       </div>
 
-<<<<<<< HEAD
-      <div>
-=======
       <div onKeyDown={handleKeyDown}>
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
         <Label htmlFor="description">Description *</Label>
         <Textarea
           id="description"
@@ -510,11 +410,7 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
         {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
       </div>
 
-<<<<<<< HEAD
-      <div>
-=======
       <div onKeyDown={handleKeyDown}>
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
         <Label htmlFor="password">Login Password *</Label>
         <Input
           id="password"
@@ -530,13 +426,8 @@ export function ClinicRegistration({ onBack }: ClinicRegistrationProps) {
   );
 
   const renderStep2 = () => (
-<<<<<<< HEAD
-    <div className="space-y-6">
-      <div>
-=======
     <div className="space-y-6" onKeyDown={handleKeyDown}>
       <div onKeyDown={handleKeyDown}>
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
         <Label htmlFor="address">Complete Address *</Label>
         <p className="text-xs text-gray-600 mt-1">Full address including building name/number</p>
         <Textarea

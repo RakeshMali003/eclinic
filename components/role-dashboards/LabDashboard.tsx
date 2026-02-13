@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import { Dashboard } from "../Dashboard";
-import { User } from "../../App";
-
-interface LabDashboardProps {
-  user: User;
-}
-
-export function LabDashboard({ user }: LabDashboardProps) {
-  return <Dashboard user={user} />;
-=======
 import React from 'react';
 import { User } from '../../App';
 
@@ -25,5 +14,4 @@ export function LabDashboard({ user }: LabDashboardProps) {
             </div>
         </div>
     );
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
 }

@@ -1,81 +1,80 @@
-const prisma = require('../config/database');
+const supabase = require('../config/supabase');
 
 class Patient {
     static async create(patientData) {
-        try {
-            const data = await prisma.patients.create({
-                data: patientData
-            });
-            return data;
-        } catch (error) {
-            throw error;
-        }
+        const { data, error } = await supabase
+            .from('patients')
+            .insert([patientData])
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
     }
 
     static async findAll(limit = 10, offset = 0) {
-        try {
-            const data = await prisma.patients.findMany({
-                take: limit,
-                skip: offset
-            });
-            return data;
-        } catch (error) {
-            throw error;
-        }
+        const { data, error } = await supabase
+            .from('patients')
+            .select('*')
+            .range(offset, offset + limit - 1);
+
+        if (error) throw error;
+        return data;
     }
 
     static async findById(id) {
-        try {
-            const data = await prisma.patients.findUnique({
-                where: { patient_id: id }
-            });
-            return data;
-        } catch (error) {
-            throw error;
-        }
+        const { data, error } = await supabase
+            .from('patients')
+            .select('*')
+            .eq('patient_id', id)
+            .maybeSingle();
+
+        if (error) throw error;
+        return data;
     }
 
     static async findByPhone(phone) {
-        try {
-            const data = await prisma.patients.findFirst({
-                where: { phone: phone }
-            });
-            return data;
-        } catch (error) {
-            throw error;
-        }
+        const { data, error } = await supabase
+            .from('patients')
+            .select('*')
+            .eq('phone', phone)
+            .maybeSingle();
+
+        if (error) throw error;
+        return data;
     }
 
     static async update(id, updates) {
-        try {
-            const data = await prisma.patients.update({
-                where: { patient_id: id },
-                data: updates
-            });
-            return data;
-        } catch (error) {
-            throw error;
-        }
+        const { data, error } = await supabase
+            .from('patients')
+            .update(updates)
+            .eq('patient_id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
     }
 
     static async delete(id) {
-        try {
-            const data = await prisma.patients.delete({
-                where: { patient_id: id }
-            });
-            return data;
-        } catch (error) {
-            throw error;
-        }
+        const { data, error } = await supabase
+            .from('patients')
+            .delete()
+            .eq('patient_id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
     }
 
     static async count() {
-        try {
-            const count = await prisma.patients.count();
-            return count;
-        } catch (error) {
-            throw error;
-        }
+        const { count, error } = await supabase
+            .from('patients')
+            .select('*', { count: 'exact', head: true });
+
+        if (error) throw error;
+        return count;
     }
 }
 

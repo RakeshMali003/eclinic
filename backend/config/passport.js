@@ -1,7 +1,6 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const prisma = require('./database');
-const bcrypt = require('bcryptjs');
+const supabase = require('./supabase');
 const { v4: uuidv4 } = require('uuid');
 const logger = require('../utils/logger');
 const { syncUserToAuth } = require('../utils/userSync');
@@ -17,25 +16,6 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-<<<<<<< HEAD
-        const email = profile.emails[0].value;
-
-        // First, try to find user by email
-        let user = await prisma.users.findUnique({
-          where: { email: email }
-        });
-
-        if (!user) {
-          // Create new user
-          user = await prisma.users.create({
-            data: {
-              full_name: profile.displayName,
-              email: email,
-              password_hash: await bcrypt.hash(Math.random().toString(36), 10), // temporary password
-              role: 'patient'
-            }
-          });
-=======
         logger.info('AUTH_OAUTH', 'Processing Google OAuth login', { google_id: profile.id, email: profile.emails?.[0]?.value });
 
         // Search in users table by google_id
@@ -112,7 +92,6 @@ passport.use(
         } else {
           user = users[0];
           logger.info('AUTH_LOGIN', 'User logged in via Google', { user_id: user.id, email: user.email });
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
         }
 
         return done(null, user);
@@ -125,16 +104,18 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user.user_id);
+  done(null, user.id);
 });
 
-passport.deserializeUser(async (userId, done) => {
+passport.deserializeUser(async (id, done) => {
   try {
-    const user = await prisma.users.findUnique({
-      where: { user_id: userId }
-    });
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    if (!user) throw new Error('User not found');
+    if (error) throw error;
     done(null, user);
   } catch (error) {
     done(error, null);

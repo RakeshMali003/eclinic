@@ -57,11 +57,7 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
           {/* Desktop Main Menu */}
           <div className="hidden lg:flex items-center gap-6">
             {mainMenuItems.map((item) => (
-<<<<<<< HEAD
-            <button
-=======
            <button
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
   key={item.view}
   onClick={() => onNavigate(item.view)}
   className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
@@ -74,14 +70,8 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
 
   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
 </button>
-<<<<<<< HEAD
-
-            ))}
-        <button
-=======
             ))}
           <button
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
   onClick={() => onNavigate("contact")}
   className="relative group px-4 py-2 text-sm font-medium transition-all duration-300 ease-out"
 >
@@ -212,7 +202,7 @@ export function Navigation({ onNavigate, onGetStarted, cartCount = 0 }: Navigati
         )}
 
         {/* Category Navigation */}
-        <div className="border-t  ">
+        <div className="border-t border-border hidden md:block bg-gradient-to-r from-secondary/50 to-secondary/30 backdrop-blur-sm">
           <div className="flex items-center gap-4 sm:gap-6 py-2 sm:py-3 overflow-x-auto">
             {categoryItems.map((item) => (
               <button

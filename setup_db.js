@@ -13,21 +13,6 @@ async function setupDatabase() {
         await client.connect();
         console.log('Connected to database');
 
-        // Create Users Table
-        await client.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        user_id VARCHAR(36) PRIMARY KEY,
-        full_name TEXT,
-        email TEXT UNIQUE,
-        phone TEXT,
-        role TEXT DEFAULT 'patient',
-        password_hash TEXT,
-        two_factor_enabled BOOLEAN DEFAULT false,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-        console.log('Created users table');
-
         // Create Patients Table
         await client.query(`
       CREATE TABLE IF NOT EXISTS patients (

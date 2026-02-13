@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import { Dashboard } from "../Dashboard";
-import { User } from "../../App";
-
-interface DoctorDashboardProps {
-  user: User;
-}
-
-export function DoctorDashboard({ user }: DoctorDashboardProps) {
-  return <Dashboard user={user} />;
-=======
 import React, { useEffect, useState } from 'react';
 import { User } from '../../App';
 import { appointmentService, AppointmentWithDetails } from '../../services/appointmentService';
@@ -68,5 +57,4 @@ export function DoctorDashboard({ user }: DoctorDashboardProps) {
             </div>
         </div>
     );
->>>>>>> 14783141afc458471b13b2994cd6e5939572361f
 }
