@@ -1,9 +1,9 @@
-import { 
-  Calendar, 
-  FileText, 
-  ShoppingBag, 
-  Activity, 
-  Brain, 
+import {
+  Calendar,
+  FileText,
+  ShoppingBag,
+  Activity,
+  Brain,
   Upload,
   CreditCard,
   Heart,
@@ -21,10 +21,25 @@ import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { PatientUser, PatientPage } from '../PatientPortal';
+import { useState, useEffect } from 'react';
+import api from '../../lib/api';
 
 interface PatientDashboardProps {
   patient: PatientUser;
   onNavigate: (page: PatientPage) => void;
+}
+
+interface Appointment {
+  appointment_id: string;
+  appointment_date: string;
+  status: string;
+  doctor?: {
+    full_name: string;
+    qualifications: string;
+  };
+  clinic?: {
+    clinic_name: string;
+  };
 }
 
 const heartRateData = [
@@ -81,6 +96,25 @@ const recentActivities = [
 ];
 
 export function PatientDashboard({ patient, onNavigate }: PatientDashboardProps) {
+  const [upcomingAppointments, setUpcomingAppointments] = useState<{ count: number; appointments: Appointment[] }>({ count: 0, appointments: [] });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUpcomingAppointments = async () => {
+      try {
+        const data = await api.get(`/appointments/upcoming/${patient.id}`);
+        setUpcomingAppointments(data);
+      } catch (error) {
+        console.error('Error fetching upcoming appointments:', error);
+        setUpcomingAppointments({ count: 0, appointments: [] });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUpcomingAppointments();
+  }, [patient.id]);
+
   return (
     <div className="p-6 space-y-6">
       {/* Welcome Header */}
@@ -102,7 +136,7 @@ export function PatientDashboard({ patient, onNavigate }: PatientDashboardProps)
               <Badge className="bg-pink-600">View</Badge>
             </div>
             <p className="text-sm text-gray-600 mb-1">Upcoming Appointments</p>
-            <p className="text-3xl font-bold text-gray-900">3</p>
+            <p className="text-3xl font-bold text-gray-900">{upcomingAppointments.count}</p>
           </CardContent>
         </Card>
 
@@ -290,46 +324,41 @@ export function PatientDashboard({ patient, onNavigate }: PatientDashboardProps)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="p-4 border-2 border-pink-200 rounded-lg bg-pink-50">
-              <div className="flex items-start gap-3 mb-3">
-                <Avatar className="size-10">
-                  <AvatarFallback className="bg-pink-600 text-white">SJ</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">Dr. Sarah Johnson</h4>
-                  <p className="text-sm text-gray-600">Cardiology, Consultation</p>
+            {loading ? (
+              <div className="text-center py-4">
+                <p className="text-gray-500">Loading appointments...</p>
+              </div>
+            ) : upcomingAppointments.appointments.length === 0 ? (
+              <div className="text-center py-4">
+                <p className="text-gray-500">No upcoming appointments</p>
+              </div>
+            ) : (
+              upcomingAppointments.appointments.map((appointment) => (
+                <div key={appointment.appointment_id} className="p-4 border-2 border-pink-200 rounded-lg bg-pink-50">
+                  <div className="flex items-start gap-3 mb-3">
+                    <Avatar className="size-10">
+                      <AvatarFallback className="bg-pink-600 text-white">
+                        {appointment.doctor?.full_name?.split(' ').map((n: string) => n[0]).join('') || 'DR'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-900">{appointment.doctor?.full_name || 'Unknown Doctor'}</h4>
+                      <p className="text-sm text-gray-600">{appointment.doctor?.qualifications || 'N/A'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Clock className="size-4" />
+                      <span>{new Date(appointment.appointment_date).toLocaleDateString()} at {new Date(appointment.appointment_date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    </div>
+                    <Badge className="bg-pink-600">{appointment.status || 'Scheduled'}</Badge>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-pink-200">
+                    <p className="text-xs text-gray-600 mb-2">{appointment.clinic?.clinic_name || 'Clinic'}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Clock className="size-4" />
-                  <span>Tomorrow, 10:30 AM</span>
-                </div>
-                <Badge className="bg-pink-600">Confirmed</Badge>
-              </div>
-              <div className="mt-3 pt-3 border-t border-pink-200">
-                <p className="text-xs text-gray-600 mb-2">In-Clinic</p>
-              </div>
-            </div>
-
-            <div className="p-4 border border-gray-200 rounded-lg">
-              <div className="flex items-start gap-3 mb-3">
-                <Avatar className="size-10">
-                  <AvatarFallback className="bg-purple-600 text-white">RK</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">Dr. Rajesh Kumar</h4>
-                  <p className="text-sm text-gray-600">Follow-up Consultation</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Video className="size-4" />
-                  <span>Jan 28, 2026, 3:00 PM</span>
-                </div>
-                <Badge className="bg-green-600">Video Call</Badge>
-              </div>
-            </div>
+              ))
+            )}
           </CardContent>
         </Card>
       </div>

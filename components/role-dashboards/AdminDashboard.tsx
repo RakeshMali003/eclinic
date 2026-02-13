@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+import { Dashboard } from "../Dashboard";
+import { User } from "../../App";
+
+interface AdminDashboardProps {
+  user: User;
+}
+
+export function AdminDashboard({ user }: AdminDashboardProps) {
+    return <Dashboard user={user} />;
+=======
 import React from 'react';
 import { User } from '../../App';
 
@@ -14,4 +25,5 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
             </div>
         </div>
     );
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
 }

@@ -4,11 +4,15 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const session = require('express-session');
 const path = require('path');
-const passport = require('./config/passport');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
+const passport = require('./config/passport');
 
 const errorHandler = require('./middleware/errorHandler');
+<<<<<<< HEAD
+const prisma = require('./config/database');
+=======
 const pool = require('./config/database');
 const supabase = require('./config/supabase');
 
@@ -26,6 +30,7 @@ const checkSupabaseConnection = async () => {
 };
 
 checkSupabaseConnection();
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
 
 // Import routes (Will be created next)
 // const clinicRoutes = require('./routes/clinicRoutes');
@@ -51,15 +56,27 @@ app.use((req, res, next) => {
 
 // Middleware
 app.use(helmet());
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174'], credentials: true }));
+app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'], credentials: true }));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(compression());
 
+// Session middleware
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false, // Set to true in production with HTTPS
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
 // Passport middleware
 app.use(passport.initialize());
+app.use(passport.session());
 
 // Static files
 app.use('/uploads', express.static('uploads'));
@@ -98,7 +115,7 @@ app.listen(PORT, () => {
 // Graceful shutdown
 process.on('SIGTERM', () => {
     console.log('👋 SIGTERM received, initiating landing sequence');
-    pool.end(() => {
+    prisma.$disconnect(() => {
         console.log('💾 Database connection closed');
         process.exit(0);
     });

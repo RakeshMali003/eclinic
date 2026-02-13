@@ -1,0 +1,11 @@
+import { defineConfig } from 'prisma/config'
+
+export default defineConfig({
+  schema: './prisma/schema.prisma',
+  database: {
+    url: process.env.DATABASE_URL || 'postgresql://username:password@localhost:5432/eclinic',
+  },
+  datasource: {
+    url: process.env.DATABASE_URL || 'postgresql://username:password@localhost:5432/eclinic',
+  },
+})

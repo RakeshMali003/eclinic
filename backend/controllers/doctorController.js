@@ -3,6 +3,75 @@ const ResponseHandler = require('../utils/responseHandler');
 const logger = require('../utils/logger');
 const { syncUserToAuth } = require('../utils/userSync');
 
+exports.registerDoctor = async (req, res, next) => {
+    try {
+        const {
+            full_name,
+            email,
+            mobile,
+            date_of_birth,
+            gender,
+            medical_council_reg_no,
+            medical_council_name,
+            registration_year,
+            qualifications,
+            university_name,
+            graduation_year,
+            experience_years,
+            specializations,
+            languages,
+            consultation_modes,
+            bank_account_name,
+            bank_account_number,
+            ifsc_code,
+            pan_number,
+            gstin,
+            verification_status
+        } = req.body;
+
+        // Create doctor record
+        const doctorData = {
+            full_name,
+            email,
+            mobile,
+            date_of_birth,
+            gender,
+            medical_council_reg_no,
+            medical_council_name,
+            registration_year,
+            qualifications,
+            university_name,
+            graduation_year,
+            experience_years,
+            bank_account_name,
+            bank_account_number,
+            ifsc_code,
+            pan_number,
+            gstin,
+            verification_status: verification_status || 'PENDING'
+        };
+
+        const newDoctor = await Doctor.create(doctorData);
+
+        // Insert related data if provided
+        if (specializations && specializations.length > 0) {
+            await Doctor.insertSpecializations(newDoctor.id, specializations);
+        }
+
+        if (languages && languages.length > 0) {
+            await Doctor.insertLanguages(newDoctor.id, languages);
+        }
+
+        if (consultation_modes && consultation_modes.length > 0) {
+            await Doctor.insertConsultationModes(newDoctor.id, consultation_modes);
+        }
+
+        ResponseHandler.created(res, newDoctor, 'Doctor registered successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.createDoctor = async (req, res, next) => {
     try {
         logger.info('DOCTOR_CREATE_START', 'Initiating doctor creation', { data: req.body });

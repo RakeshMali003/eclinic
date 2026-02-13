@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+import { Dashboard } from "../Dashboard";
+import { User } from "../../App";
+
+interface ClinicDashboardProps {
+  user: User;
+}
+
+export function ClinicDashboard({ user }: ClinicDashboardProps) {
+  return <Dashboard user={user} />;
+=======
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
@@ -79,4 +90,5 @@ export function ClinicDashboard({ user }: ClinicDashboardProps) {
             </div>
         </div>
     );
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
 }

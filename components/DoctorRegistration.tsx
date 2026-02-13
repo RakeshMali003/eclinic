@@ -263,6 +263,13 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
 
       await authService.signUpDoctor(registrationData, formData.password, files);
 
+<<<<<<< HEAD
+      toast.success("Registration successful! Please login to continue.");
+      // Redirect to login or verification pending page
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
+=======
       toast.success("Registration successful!");
 
       // Check if logged in (auto-confirm or no email verification needed)
@@ -276,6 +283,7 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
           onBack();
         }, 2000);
       }
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
     } catch (error: any) {
       console.error("Registration failed:", error);
       toast.error(error.message || "Registration failed. Please try again.");
@@ -295,6 +303,8 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div>
+<<<<<<< HEAD
+=======
         <Button
           type="button"
           onClick={() => authService.signInWithGoogle('doctor')}
@@ -319,6 +329,7 @@ export function DoctorRegistration({ onBack }: DoctorRegistrationProps) {
           </div>
         </div>
 
+>>>>>>> 14783141afc458471b13b2994cd6e5939572361f
         <Label htmlFor="fullName">Dr. Full Name *</Label>
         <Input
           id="fullName"
